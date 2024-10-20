@@ -1,8 +1,10 @@
-import React from 'react'
+import ResponsiveAppBar from "./ResponsiveAppBar"
 
 function Header() {
   return (
-    <div>Header</div>
+    <div>
+      <ResponsiveAppBar />
+    </div>
   )
 }
 
