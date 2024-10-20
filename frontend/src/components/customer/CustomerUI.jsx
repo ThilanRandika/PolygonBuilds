@@ -5,9 +5,6 @@ function CustomerUI() {
   return (
     <div>
       <Header />
-      <main>
-        <h1>Customer UI</h1>
-      </main>
       <Footer />
     </div>
   )
