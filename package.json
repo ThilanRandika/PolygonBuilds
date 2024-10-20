@@ -1,0 +1,20 @@
+{
+  "name": "polygonbuilds",
+  "version": "1.0.0",
+  "description": "3d model",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "sandeep and thilan",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "mongoose": "^8.7.2",
+    "nodemon": "^3.1.7",
+    "xepress": "^0.0.1-security"
+  }
+}
