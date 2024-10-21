@@ -8,6 +8,7 @@ import './App.css'
 import CustomerUI from './components/customer/CustomerUI';
 import AdminUI from './components/admin/AdminUI';
 import STLViewer from './components/customer/ModelRendering/STLViewer';
+import CreateOrder from './components/customer/order/CreateOrder';
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
             <Route path="/*" element={<CustomerUI/>}></Route>
             <Route path="/admin/*" element={<AdminUI/>}></Route>
             <Route path="/stl-viewer" element={<STLViewer />} />
+            <Route path="/createOrder" element={<CreateOrder />} />
           </Route>
         </Routes>
       </BrowserRouter>

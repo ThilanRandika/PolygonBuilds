@@ -40,7 +40,7 @@ const FileUpload = () => {
           localStorage.setItem('uploadedFileURL', downloadURL);
 
           // Redirect to the STL viewer page
-          navigate('/stl-viewer');
+          navigate('/createOrder');
         });
       }
     );

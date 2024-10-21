@@ -24,7 +24,6 @@ const STLViewer = () => {
   const [volume, setVolume] = useState(0);
   const [unit, setUnit] = useState("mm");
 
-  // Load the file URL from localStorage
   useEffect(() => {
     const fileURL = localStorage.getItem("uploadedFileURL");
     if (fileURL) {
@@ -42,15 +41,12 @@ const STLViewer = () => {
     const scene = new THREE.Scene();
     const newCamera = new THREE.PerspectiveCamera(
       75,
-      window.innerWidth / window.innerHeight,
+      370 / 424, // Match aspect ratio to the new width and height
       0.1,
       1000
     );
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(
-      (window.innerWidth * 60) / 100,
-      (window.innerHeight * 3) / 5
-    );
+    renderer.setSize(370, 424); // Set width and height of canvas
     renderer.setClearColor(0xd8d8d8, 1); // Set background to white
 
     const viewerElement = document.getElementById("viewer");
@@ -82,13 +78,11 @@ const STLViewer = () => {
         scene.add(newMesh);
         setMesh(newMesh);
 
-        // Calculate dimensions
         const width = boundingBox.max.x - boundingBox.min.x;
         const height = boundingBox.max.y - boundingBox.min.y;
         const depth = boundingBox.max.z - boundingBox.min.z;
         setDimensions({ width, height, depth });
 
-        // Calculate surface area and volume
         const area = calculateSurfaceArea(geometry);
         const vol = calculateVolume(geometry);
         setSurfaceArea(area);
@@ -101,12 +95,6 @@ const STLViewer = () => {
         light.position.set(10, 10, 10);
         scene.add(light);
         scene.add(new THREE.AmbientLight(0x404040));
-
-        const gridHelper = new THREE.GridHelper(10, 10);
-        scene.add(gridHelper);
-
-        const axesHelper = new THREE.AxesHelper(5);
-        scene.add(axesHelper);
 
         const animate = () => {
           requestAnimationFrame(animate);
@@ -121,8 +109,8 @@ const STLViewer = () => {
 
     window.addEventListener("resize", () => {
       if (viewerElement) {
-        const width = viewerElement.clientWidth;
-        const height = viewerElement.clientHeight;
+        const width = 370;
+        const height = 424;
         renderer.setSize(width, height);
         newCamera.aspect = width / height;
         newCamera.updateProjectionMatrix();
@@ -195,61 +183,61 @@ const STLViewer = () => {
   };
 
   return (
-    <div>
-      <h1>STL Viewer</h1>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <div style={{ position: "relative", width: "70%", height: "440px" }}>
+    <div style={{ width: "320px" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{ position: "relative", width: "370px", height: "424px" }}>
           <div id="viewer" style={{ width: "100%", height: "100%" }}></div>
-          <button
-            onClick={zoomIn}
+          <div
             style={{
               position: "absolute",
-              top: "10px",
-              left: "10px",
-              zIndex: 1,
-              padding: "10px",
-              borderRadius: "50%",
-              backgroundColor: "#fff",
-              border: "1px solid #ccc",
-              cursor: "pointer",
+              top: "80px",
+              right: "10px",
+              display: "flex",
+              flexDirection: "column",
+              transform: "translateY(-50%)",
             }}
           >
-            <FaSearchPlus />
-          </button>
-          <button
-            onClick={zoomOut}
-            style={{
-              position: "absolute",
-              top: "10px",
-              left: "60px",
-              zIndex: 1,
-              padding: "10px",
-              borderRadius: "50%",
-              backgroundColor: "#fff",
-              border: "1px solid #ccc",
-              cursor: "pointer",
-            }}
-          >
-            <FaSearchMinus />
-          </button>
-          <button
-            onClick={toggleXrayView}
-            style={{
-              position: "absolute",
-              top: "10px",
-              left: "110px",
-              zIndex: 1,
-              padding: "10px",
-              borderRadius: "50%",
-              backgroundColor: "#fff",
-              border: "1px solid #ccc",
-              cursor: "pointer",
-            }}
-          >
-            {isXray ? <FaRegEyeSlash /> : <FaRegEye />}
-          </button>
+            <button
+              onClick={zoomIn}
+              style={{
+                padding: "10px",
+                borderRadius: "50%",
+                backgroundColor: "#fff",
+                border: "1px solid #ccc",
+                marginBottom: "10px",
+                cursor: "pointer",
+              }}
+            >
+              <FaSearchPlus />
+            </button>
+            <button
+              onClick={zoomOut}
+              style={{
+                padding: "10px",
+                borderRadius: "50%",
+                backgroundColor: "#fff",
+                border: "1px solid #ccc",
+                marginBottom: "10px",
+                cursor: "pointer",
+              }}
+            >
+              <FaSearchMinus />
+            </button>
+            <button
+              onClick={toggleXrayView}
+              style={{
+                padding: "10px",
+                borderRadius: "50%",
+                backgroundColor: "#fff",
+                border: "1px solid #ccc",
+                cursor: "pointer",
+              }}
+            >
+              {isXray ? <FaRegEyeSlash /> : <FaRegEye />}
+            </button>
+          </div>
         </div>
-        <div style={{ width: "25%" }}>
+        <div style={{ width: "320px", marginTop: "20px" }}>
           <h3>STL File Details</h3>
           <p>
             Dimensions (WxHxD):{" "}
@@ -261,16 +249,20 @@ const STLViewer = () => {
           </p>
           <p>
             Surface Area: {convertUnit(surfaceArea, "mm", unit).toFixed(2)}{" "}
-            {unit}²
+            {unit === "inch" ? "in²" : unit === "cm" ? "cm²" : "mm²"}
           </p>
           <p>
-            Volume: {convertUnit(volume, "mm", unit).toFixed(2)} {unit}³
+            Volume: {convertUnit(volume, "mm", unit).toFixed(2)}{" "}
+            {unit === "inch" ? "in³" : unit === "cm" ? "cm³" : "mm³"}
           </p>
-          <select onChange={handleUnitChange} value={unit}>
-            <option value="mm">Millimeters (mm)</option>
-            <option value="cm">Centimeters (cm)</option>
-            <option value="inch">Inches (inch)</option>
-          </select>
+          <label>
+            Unit:{" "}
+            <select value={unit} onChange={handleUnitChange}>
+              <option value="mm">mm</option>
+              <option value="cm">cm</option>
+              <option value="inch">inch</option>
+            </select>
+          </label>
         </div>
       </div>
     </div>
