@@ -2,19 +2,21 @@ import { useState } from 'react';
 import { Box, Typography, Input, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../../firebase/firebaseConfig'; // Make sure this points to your Firebase config
+import { storage } from '../../../firebase/firebaseConfig'; // Ensure your Firebase config is set up
+import { useNavigate } from 'react-router-dom'; // If using React Router
 
 const FileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const navigate = useNavigate(); // To navigate to the STL viewer page
 
-  // Handle file selection and trigger the confirmation popup
+  // Handle file selection
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
-    setOpenDialog(true); // Open the confirmation dialog
+    setOpenDialog(true);
   };
 
-  // Handle file upload to Firebase Storage
+  // Handle file upload
   const handleUpload = () => {
     if (!selectedFile) return;
 
@@ -24,32 +26,30 @@ const FileUpload = () => {
     uploadTask.on(
       'state_changed',
       (snapshot) => {
-        // Optional: Handle file upload progress here
+        // Optional: You can add a progress bar here
       },
       (error) => {
         console.error('Error uploading file:', error);
       },
       () => {
-        // File upload completed, get the download URL
+        // File uploaded successfully, get the download URL
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           console.log('File available at', downloadURL);
 
-          // You can also send the download URL to your backend here if needed
+          // Store the download URL in localStorage (or state management like Redux)
+          localStorage.setItem('uploadedFileURL', downloadURL);
+
+          // Redirect to the STL viewer page
+          navigate('/stl-viewer');
         });
       }
     );
-    setOpenDialog(false); // Close dialog after upload
-  };
-
-  // Handle user closing the dialog without uploading
-  const handleCancel = () => {
-    setSelectedFile(null); // Clear the selected file
-    setOpenDialog(false); // Close the confirmation dialog
+    setOpenDialog(false);
   };
 
   return (
     <>
-      {/* The main upload component */}
+      {/* Main upload component */}
       <label htmlFor="upload-button" style={{ cursor: 'pointer' }}>
         <Box
           sx={{
@@ -62,7 +62,7 @@ const FileUpload = () => {
             margin: 'auto',
             mt: 5,
             '&:hover': {
-              backgroundColor: '#e3f2fd68', // Light blue background on hover
+              backgroundColor: '#e3f2fd68',
             },
           }}
         >
@@ -78,8 +78,6 @@ const FileUpload = () => {
             onChange={handleFileChange}
             sx={{ display: 'none' }}
           />
-
-          {/* Remove the IconButton and just display the icon without interactive behavior */}
           <Box component="span">
             <UploadFileIcon sx={{ color: '#b4b7ff', fontSize: '3.5rem' }} />
           </Box>
@@ -91,10 +89,7 @@ const FileUpload = () => {
       </label>
 
       {/* Confirmation dialog for file upload */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCancel} // Close when clicking outside or pressing cancel
-      >
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Upload Confirmation</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -102,7 +97,7 @@ const FileUpload = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancel} color="primary">
+          <Button onClick={() => setOpenDialog(false)} color="primary">
             Cancel
           </Button>
           <Button onClick={handleUpload} color="primary" autoFocus>

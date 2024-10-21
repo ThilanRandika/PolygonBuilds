@@ -7,6 +7,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css'
 import CustomerUI from './components/customer/CustomerUI';
 import AdminUI from './components/admin/AdminUI';
+import STLViewer from './components/customer/ModelRendering/STLViewer';
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
           <Route>
             <Route path="/*" element={<CustomerUI/>}></Route>
             <Route path="/admin/*" element={<AdminUI/>}></Route>
+            <Route path="/stl-viewer" element={<STLViewer />} />
           </Route>
         </Routes>
       </BrowserRouter>
