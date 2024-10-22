@@ -7,6 +7,10 @@ const app = express();
 require("dotenv").config();
 
 
+// Import admin routes
+const customizationRoute = require("./routes/admin/customization");
+
+
 const PORT = process.env.PORT || 8070;
 // Allow requests from the specified origin
 const corsOptions = {
@@ -33,6 +37,10 @@ connection.once("open", ()=> {
     console.log("Mongodb Connection Success!");
 
 })
+
+
+// Use admin routs
+app.use("/api/customization", customizationRoute);
 
 
 app.listen(PORT,() =>{

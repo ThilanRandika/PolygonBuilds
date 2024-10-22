@@ -1,8 +1,10 @@
-import React from 'react'
+import AdminCustomizationForm from "./AdminCustomizationForm "
 
 function Customize() {
   return (
-    <div>Customize</div>
+    <div>
+      <AdminCustomizationForm></AdminCustomizationForm>
+    </div>
   )
 }
 
