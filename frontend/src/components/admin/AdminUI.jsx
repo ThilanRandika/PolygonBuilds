@@ -11,7 +11,7 @@ function AdminUI() {
   return (
     <div className='bg-slate-200'>
       <Header />
-        <div className='ml-[11%] mr-[10%]'>
+        <div className='ml-[11%] mr-[10%] pt-10'>
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/customize" element={<Customize />} />

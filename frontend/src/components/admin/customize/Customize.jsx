@@ -1,5 +1,5 @@
 import AdminCustomizationForm from "./AdminCustomizationForm "
-import SelectionOptions from "../../customer/ModelRendering/SelectionOptions"
+import CustomizationsPreview from "./CustomizationsPreview"
 
 function Customize() {
   return (
@@ -8,7 +8,7 @@ function Customize() {
         <AdminCustomizationForm></AdminCustomizationForm>
       </div>
       <div className="flex-1">
-        {/* <SelectionOptions></SelectionOptions> */}
+        <CustomizationsPreview></CustomizationsPreview>
       </div>
     </div>
   )
