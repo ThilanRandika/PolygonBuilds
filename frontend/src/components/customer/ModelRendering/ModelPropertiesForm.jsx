@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   TextField,
   FormControl,
@@ -7,39 +8,59 @@ import {
   MenuItem,
   Checkbox,
   FormControlLabel,
-  FormGroup,
   Button,
   Typography,
   TextareaAutosize,
-} from '@mui/material';
+  Box,
+} from "@mui/material";
 
-const ModelPropertiesForm = () => {
+const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink }) => {
   const [formData, setFormData] = useState({
-    quantity: '',
-    process: '',
-    technology: '',
-    material: '',
-    finish: '',
-    threadTappedHoles: false,
-    inserts: false,
-    postAssembly: false,
-    inspection: '',
-    certification: {
-      as9100: false,
-      iso9001: false,
-      cpkPp: false,
-      certificateConformance: false,
-      ndtInspection: false,
-    },
-    specialInstructions: '',
-    color: '',
+    quantity: "",
+    material: "",
+    finish: "",
+    color: "",
+    specialInstructions: "",
     verticalResolutionVisible: false,
-    verticalResolution: '',
+    verticalResolution: "",
     verticalResolutionLetTeamDecide: false,
     infilTypeVisible: false,
-    infilType: '',
+    infilType: "",
     infilTypeLetTeamDecide: false,
   });
+
+  const [materials, setMaterials] = useState([]);
+  const [finishes, setFinishes] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCustomizations = async () => {
+      try {
+        const response = await axios.get('http://localhost:8070/api/customization/all-customizations');
+        setMaterials(response.data.materials || []);
+        setFinishes(response.data.finishes || []);
+        setColors(response.data.colors || []);
+      } catch (error) {
+        console.error('Error fetching customizations:', error);
+      } finally {
+        setIsLoading(false); // Set loading to false after data is fetched
+      }
+    };
+  
+    fetchCustomizations();
+  }, []);
+
+  useEffect(() => {
+    // Update form data whenever selectedOptions changes
+    setFormData((prevState) => ({
+      ...prevState,
+      material: selectedOptions.material,
+      finish: selectedOptions.finish,
+      color: selectedOptions.color,
+    }));
+  }, [selectedOptions]);
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -47,6 +68,11 @@ const ModelPropertiesForm = () => {
       ...prevState,
       [name]: value,
     }));
+
+    if (name === "material" || name === "finish" || name === "color") {
+      handleOptionSelect(name, value);  // Sync with SelectionOptions
+    }
+
   };
 
   const handleCheckboxChange = (e) => {
@@ -57,32 +83,42 @@ const ModelPropertiesForm = () => {
     }));
   };
 
-  const handleCertificationChange = (e) => {
-    const { name, checked } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      certification: {
-        ...prevState.certification,
-        [name]: checked,
-      },
-    }));
-  };
-
-  const toggleVisibility = (field) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [field]: !prevState[field],
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    // Add logic to handle form submission
+
+    // Create the order data with the actual STL model link
+    const orderData = {
+      user_id: "user_id_placeholder", // Replace with actual user ID
+      model: modelLink,  // Use the passed modelLink from STLViewer
+      quantity: formData.quantity,
+      material: formData.material,
+      color: formData.color,
+      quality: formData.finish,
+      specialInstructions: formData.specialInstructions,
+      // If the checkbox is checked, send "Let our team decide" instead of the selected value
+    verticalResolution: formData.verticalResolutionLetTeamDecide
+    ? "Let our team decide"
+    : formData.verticalResolution,
+
+  infilType: formData.infilTypeLetTeamDecide
+    ? "Let our team decide"
+    : formData.infilType,
+    };
+
+    try {
+      const response = await axios.post("http://localhost:8070/api/order/create-order", orderData);
+      console.log("Order created:", response.data);
+    } catch (error) {
+      console.error("Error creating order:", error);
+    }
   };
+
+
+  if (isLoading) return <p>Loading...</p>;
+
 
   return (
-    <div style={{ padding: '20px' }}> {/* Padding applied here */}
+    <div style={{ padding: "20px" }}>
       <form onSubmit={handleSubmit}>
         <Typography variant="h5" gutterBottom>
           Part Properties
@@ -100,210 +136,188 @@ const ModelPropertiesForm = () => {
           margin="normal"
         />
 
-        {/* Process */}
-        <FormControl variant="outlined" fullWidth margin="normal">
-          <InputLabel>Process</InputLabel>
-          <Select name="process" value={formData.process} onChange={handleInputChange}>
-            <MenuItem value="Plastic 3D Printing">Plastic 3D Printing</MenuItem>
-            <MenuItem value="Metal 3D Printing">Metal 3D Printing</MenuItem>
-          </Select>
-        </FormControl>
-
-        {/* Technology */}
-        <FormControl variant="outlined" fullWidth margin="normal">
-          <InputLabel>Technology</InputLabel>
-          <Select name="technology" value={formData.technology} onChange={handleInputChange}>
-            <MenuItem value="SLS">Selective Laser Sintering (SLS)</MenuItem>
-            <MenuItem value="FDM">Fused Deposition Modeling (FDM)</MenuItem>
-            <MenuItem value="SLA">Stereolithography (SLA)</MenuItem>
-          </Select>
-        </FormControl>
-
         {/* Material */}
         <FormControl variant="outlined" fullWidth margin="normal">
           <InputLabel>Material</InputLabel>
-          <Select name="material" value={formData.material} onChange={handleInputChange}>
-            <MenuItem value="Nylon">Nylon</MenuItem>
-            <MenuItem value="PLA">PLA</MenuItem>
-            <MenuItem value="ABS">ABS</MenuItem>
+          <Select
+            name="material"
+            value={formData.material || ""}
+            onChange={handleInputChange}
+          >
+            {materials.length > 0 ? (
+              materials.map((material, index) => (
+                <MenuItem key={index} value={material.name}>
+                  {material.name}
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem disabled>No materials available</MenuItem>
+            )}
           </Select>
         </FormControl>
 
         {/* Color */}
         <FormControl variant="outlined" fullWidth margin="normal">
           <InputLabel>Color</InputLabel>
-          <Select name="color" value={formData.color} onChange={handleInputChange}>
-            <MenuItem value="Red">Red</MenuItem>
-            <MenuItem value="Blue">Blue</MenuItem>
-            <MenuItem value="Black">Black</MenuItem>
+          <Select
+            name="color"
+            value={formData.color}
+            onChange={handleInputChange}
+          >
+            {colors.length > 0 ? (
+              colors.map((color, index) => (
+                <MenuItem key={index} value={color.name}>
+                  {color.name}
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem disabled>No colors available</MenuItem>
+            )}
           </Select>
         </FormControl>
 
         {/* Finish */}
         <FormControl variant="outlined" fullWidth margin="normal">
           <InputLabel>Finish</InputLabel>
-          <Select name="finish" value={formData.finish} onChange={handleInputChange}>
-            <MenuItem value="Standard">Standard</MenuItem>
-            <MenuItem value="Dyed">Dyed</MenuItem>
+          <Select
+            name="finish"
+            value={formData.finish}
+            onChange={handleInputChange}
+          >
+            {finishes.length > 0 ? (
+              finishes.map((finish, index) => (
+                <MenuItem key={index} value={finish.name}>
+                  {finish.name}
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem disabled>No finishes available</MenuItem>
+            )}
           </Select>
         </FormControl>
 
-        {/* Thread & Tapped Holes */}
-        <FormControlLabel
-          control={
-            <Checkbox
-              name="threadTappedHoles"
-              checked={formData.threadTappedHoles}
-              onChange={handleCheckboxChange}
-            />
-          }
-          label="Threads and Tapped Holes"
-        />
-
-        {/* Inserts */}
-        <FormControlLabel
-          control={
-            <Checkbox
-              name="inserts"
-              checked={formData.inserts}
-              onChange={handleCheckboxChange}
-            />
-          }
-          label="Inserts"
-        />
-
-        {/* Post Assembly */}
-        <FormControlLabel
-          control={
-            <Checkbox
-              name="postAssembly"
-              checked={formData.postAssembly}
-              onChange={handleCheckboxChange}
-            />
-          }
-          label="Post Assembly"
-        />
-
-        {/* Inspection */}
-        <FormControl variant="outlined" fullWidth margin="normal">
-          <InputLabel>Inspection</InputLabel>
-          <Select name="inspection" value={formData.inspection} onChange={handleInputChange}>
-            <MenuItem value="Standard Inspection">Standard Inspection</MenuItem>
-            <MenuItem value="Detailed Inspection">Detailed Inspection</MenuItem>
-            <MenuItem value="Custom Inspection">Custom Inspection</MenuItem>
-          </Select>
-        </FormControl>
-
+        
         {/* Vertical Resolution */}
-        <FormControlLabel
-          control={<Checkbox checked={formData.verticalResolutionVisible} onChange={() => toggleVisibility('verticalResolutionVisible')} />}
-          label="Select Vertical Resolution"
-        />
-        {formData.verticalResolutionVisible && (
-          <>
+        <FormControl component="fieldset" fullWidth>
+          <Typography mt={2}>Vertical Resolution</Typography>
+
+          <Box display="flex" flexDirection="column">
+            {/* Vertical Resolution Select */}
             <FormControl variant="outlined" fullWidth margin="normal">
-              <InputLabel>Vertical Resolution</InputLabel>
-              <Select name="verticalResolution" value={formData.verticalResolution} onChange={handleInputChange}>
+              <Select
+                displayEmpty
+                name="verticalResolution"
+                value={formData.verticalResolution}
+                onChange={handleInputChange}
+                renderValue={(selected) =>
+                  selected ? selected : "Select Vertical Resolution"
+                }
+                disabled={formData.verticalResolutionLetTeamDecide}
+              >
                 <MenuItem value="0.1mm">0.1mm</MenuItem>
                 <MenuItem value="0.2mm">0.2mm</MenuItem>
               </Select>
             </FormControl>
+
+            {/* Let Team Decide Checkbox */}
             <FormControlLabel
-              control={<Checkbox name="verticalResolutionLetTeamDecide" checked={formData.verticalResolutionLetTeamDecide} onChange={handleCheckboxChange} />}
+              control={
+                <Checkbox
+                  name="verticalResolutionLetTeamDecide"
+                  checked={formData.verticalResolutionLetTeamDecide}
+                  onChange={(e) => {
+                    handleCheckboxChange(e);
+                    if (e.target.checked) {
+                      // Clear selected vertical resolution if checkbox is checked
+                      handleInputChange({
+                        target: { name: "verticalResolution", value: "" },
+                      });
+                    }
+                  }}
+                />
+              }
               label="Let our team decide for you"
             />
-          </>
-        )}
+          </Box>
+        </FormControl>
 
         {/* Infill Type */}
-        <FormControlLabel
-          control={<Checkbox checked={formData.infilTypeVisible} onChange={() => toggleVisibility('infilTypeVisible')} />}
-          label="Select Infill Type"
-        />
-        {formData.infilTypeVisible && (
-          <>
+        <FormControl component="fieldset" fullWidth>
+          <Typography mt={2}>Infill Type</Typography>
+
+          <Box display="flex" flexDirection="column">
+            {/* Infill Type Select */}
             <FormControl variant="outlined" fullWidth margin="normal">
-              <InputLabel>Infill Type</InputLabel>
-              <Select name="infilType" value={formData.infilType} onChange={handleInputChange}>
+              <Select
+                displayEmpty
+                name="infilType"
+                value={formData.infilType}
+                onChange={handleInputChange}
+                renderValue={(selected) =>
+                  selected ? selected : "Select Infill Type"
+                }
+                disabled={formData.infilTypeLetTeamDecide}
+              >
                 <MenuItem value="Low">Low</MenuItem>
                 <MenuItem value="Medium">Medium</MenuItem>
                 <MenuItem value="High">High</MenuItem>
               </Select>
             </FormControl>
+
+            {/* Let Team Decide Checkbox */}
             <FormControlLabel
-              control={<Checkbox name="infilTypeLetTeamDecide" checked={formData.infilTypeLetTeamDecide} onChange={handleCheckboxChange} />}
+              control={
+                <Checkbox
+                  name="infilTypeLetTeamDecide"
+                  checked={formData.infilTypeLetTeamDecide}
+                  onChange={(e) => {
+                    handleCheckboxChange(e);
+                    if (e.target.checked) {
+                      // Clear selected infil type if checkbox is checked
+                      handleInputChange({
+                        target: { name: "infilType", value: "" },
+                      });
+                    }
+                  }}
+                />
+              }
               label="Let our team decide for you"
             />
-          </>
-        )}
-
-        {/* Certification */}
-        <FormGroup>
-          <Typography variant="h6">Certifications</Typography>
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="as9100"
-                checked={formData.certification.as9100}
-                onChange={handleCertificationChange}
-              />
-            }
-            label="AS9100"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="iso9001"
-                checked={formData.certification.iso9001}
-                onChange={handleCertificationChange}
-              />
-            }
-            label="ISO9001"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="cpkPp"
-                checked={formData.certification.cpkPp}
-                onChange={handleCertificationChange}
-              />
-            }
-            label="CPK/PP Control"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="certificateConformance"
-                checked={formData.certification.certificateConformance}
-                onChange={handleCertificationChange}
-              />
-            }
-            label="Certificate of Conformance"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                name="ndtInspection"
-                checked={formData.certification.ndtInspection}
-                onChange={handleCertificationChange}
-              />
-            }
-            label="NDT Inspection"
-          />
-        </FormGroup>
+          </Box>
+        </FormControl>
 
         {/* Special Instructions */}
-        <TextareaAutosize
-          minRows={4}
-          name="specialInstructions"
-          value={formData.specialInstructions}
-          onChange={handleInputChange}
-          placeholder="Enter any special instructions..."
-          style={{ width: '100%', marginTop: '20px', padding: '10px', fontSize: '16px' }}
-        />
+        <FormControl component="fieldset" fullWidth>
+          <Typography mt={2} variant="h6" gutterBottom>
+            Special Instructions
+          </Typography>
+          <Typography variant="body2" color="textSecondary" gutterBottom>
+            Please provide any additional notes or instructions that you would like
+            our team to consider while processing your order. This could include
+            specific handling requests, color preferences, or other details.
+          </Typography>
+          <TextareaAutosize
+            minRows={4}
+            name="specialInstructions"
+            value={formData.specialInstructions}
+            onChange={handleInputChange}
+            placeholder="Enter any special instructions..."
+            style={{
+              width: "100%",
+              marginTop: "10px",
+              padding: "10px",
+              fontSize: "16px",
+            }}
+          />
+        </FormControl>
 
         {/* Submit Button */}
-        <Button variant="contained" color="primary" type="submit" style={{ marginTop: '20px' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          type="submit"
+          style={{ marginTop: "20px" }}
+        >
           Submit
         </Button>
       </form>

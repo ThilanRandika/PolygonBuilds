@@ -10,6 +10,9 @@ require("dotenv").config();
 // Import admin routes
 const customizationRoute = require("./routes/admin/customization");
 
+// Import customer routes
+const orderRoute = require("./routes/customer/order");
+
 
 const PORT = process.env.PORT || 8070;
 // Allow requests from the specified origin
@@ -41,6 +44,9 @@ connection.once("open", ()=> {
 
 // Use admin routs
 app.use("/api/customization", customizationRoute);
+
+// Use customer routs
+app.use("/api/order", orderRoute);
 
 
 app.listen(PORT,() =>{

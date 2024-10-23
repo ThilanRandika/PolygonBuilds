@@ -9,7 +9,7 @@ import {
   FaRegEyeSlash,
 } from "react-icons/fa";
 
-const STLViewer = () => {
+const STLViewer = ({ setModelLink }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isXray, setIsXray] = useState(false);
   const [mesh, setMesh] = useState(null);
@@ -28,6 +28,7 @@ const STLViewer = () => {
     const fileURL = localStorage.getItem("uploadedFileURL");
     if (fileURL) {
       setUploadedFile(fileURL);
+      setModelLink(fileURL);
     }
   }, []);
 

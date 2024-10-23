@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 // Define the schema for Order
 const orderSchema = new mongoose.Schema({
     user_id: {
-        type: mongoose.Schema.Types.ObjectId, // Refers to a user from the Customer model
-        ref: 'Customer',
+        type: String, // Refers to a user from the Customer model
+        // ref: 'Customer',
         required: true
     },
     model: {
@@ -12,17 +12,33 @@ const orderSchema = new mongoose.Schema({
         required: true,
         maxlength: 500
     },
+    quantity: {
+        type: Number,
+        required: true,
+    },
     material: {
-        type: Number, // Assuming material type is mapped to some predefined number
+        type: String, // Assuming material type is mapped to some predefined String
         required: true
     },
     color: {
-        type: Number, // Assuming color is an integer representing some color code
+        type: String, // Assuming color is an integer representing some color code
         required: true
     },
     quality: {
-        type: Number, // Assuming quality is represented by an integer
+        type: String, // Assuming quality is represented by an integer
         required: true
+    },
+    specialInstructions: {
+        type: String,
+        required: true,
+    },
+    infilType: {
+        type: String,
+        required: true,
+    },
+    verticalResolution: {
+        type: String,
+        required: true,
     },
     date: {
         type: Date,
