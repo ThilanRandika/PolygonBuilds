@@ -8,7 +8,7 @@ function Customize() {
         <AdminCustomizationForm></AdminCustomizationForm>
       </div>
       <div className="flex-1">
-        <SelectionOptions></SelectionOptions>
+        {/* <SelectionOptions></SelectionOptions> */}
       </div>
     </div>
   )
