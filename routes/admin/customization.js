@@ -48,4 +48,23 @@ router.post("/add-customization", async (req, res) => {
   }
 });
 
+
+// API to get all customizations (materials, finishes, and colors)
+router.get("/all-customizations", async (req, res) => {
+  try {
+    const customization = await Customization.findOne({});
+    if (!customization) {
+      return res.status(404).json({ message: "No customizations found" });
+    }
+    res.status(200).json({
+      materials: customization.materials,
+      finishes: customization.finishes,
+      colors: customization.colors,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching customizations", error });
+  }
+});
+
+
 module.exports = router;

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { TextField, Button, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import axios from "axios";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from '../../../firebase/firebaseConfig';  // Ensure firebase is correctly configured
 
 const AdminCustomizationForm = () => {
   const [materials, setMaterials] = useState([]);
@@ -10,6 +12,9 @@ const AdminCustomizationForm = () => {
   const [newMaterial, setNewMaterial] = useState({ name: "", image: "" });
   const [newFinish, setNewFinish] = useState({ name: "", image: "" });
   const [newColor, setNewColor] = useState({ name: "", colorCode: "" });
+
+  const [imageFile, setImageFile] = useState(null);  // For storing the selected file
+  const [uploading, setUploading] = useState(false); // For upload state
 
   const [openDialog, setOpenDialog] = useState(false);
   const [pendingUpdate, setPendingUpdate] = useState(null);
@@ -29,6 +34,35 @@ const AdminCustomizationForm = () => {
     }
   };
 
+  // Function to handle the image upload
+  const uploadImageToFirebase = (file) => {
+    return new Promise((resolve, reject) => {
+      const storageRef = ref(storage, `customizations/${file.name}`);  // Create a reference
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      setUploading(true);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Optional: You can monitor the upload progress here if needed
+        },
+        (error) => {
+          console.error("Image upload failed:", error);
+          setUploading(false);
+          reject(error);
+        },
+        () => {
+          // On complete, get the download URL
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setUploading(false);
+            resolve(downloadURL);  // Return the download link
+          });
+        }
+      );
+    });
+  };
+
   const handleAddCustomization = async (type, customization) => {
     const exists = await checkCustomizationExists(type, customization);
 
@@ -37,8 +71,14 @@ const AdminCustomizationForm = () => {
       setPendingUpdate({ type, customization });
       setOpenDialog(true);  // Open dialog
     } else {
-      // Proceed to add the customization if it does not exist
       try {
+        // Upload image to Firebase Storage first
+        if (imageFile) {
+          const imageUrl = await uploadImageToFirebase(imageFile);
+          customization.image = imageUrl;  // Set the Firebase URL to the image field
+        }
+
+        // Proceed to add the customization if it does not exist
         const response = await axios.post("http://localhost:8070/api/customization/add-customization", {
           type,
           customization,
@@ -54,6 +94,12 @@ const AdminCustomizationForm = () => {
   const handleConfirmUpdate = async () => {
     if (pendingUpdate) {
       try {
+        // Upload image to Firebase if there's a new image
+        if (imageFile) {
+          const imageUrl = await uploadImageToFirebase(imageFile);
+          pendingUpdate.customization.image = imageUrl;  // Set the Firebase URL to the image field
+        }
+
         const response = await axios.post("http://localhost:8070/api/customization/add-customization", {
           type: pendingUpdate.type,
           customization: pendingUpdate.customization,
@@ -77,16 +123,19 @@ const AdminCustomizationForm = () => {
   const handleAddMaterial = () => {
     handleAddCustomization("materials", newMaterial);
     setNewMaterial({ name: "", image: "" });
+    setImageFile(null);  // Clear the selected image file
   };
 
   const handleAddFinish = () => {
     handleAddCustomization("finishes", newFinish);
     setNewFinish({ name: "", image: "" });
+    setImageFile(null);  // Clear the selected image file
   };
 
   const handleAddColor = () => {
     handleAddCustomization("colors", newColor);
     setNewColor({ name: "", colorCode: "" });
+    setImageFile(null);  // Clear the selected image file
   };
 
   return (
@@ -101,13 +150,12 @@ const AdminCustomizationForm = () => {
         value={newMaterial.name}
         onChange={(e) => setNewMaterial({ ...newMaterial, name: e.target.value })}
       />
-      <TextField
-        label="Image URL"
-        fullWidth
-        value={newMaterial.image}
-        onChange={(e) => setNewMaterial({ ...newMaterial, image: e.target.value })}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImageFile(e.target.files[0])}  // Select the file
       />
-      <Button onClick={handleAddMaterial}>Add Material</Button>
+      <Button onClick={handleAddMaterial} disabled={uploading}>Add Material</Button>
 
       {/* Form for Adding New Finish */}
       <Typography variant="h6" gutterBottom>Add New Finish</Typography>
@@ -117,13 +165,12 @@ const AdminCustomizationForm = () => {
         value={newFinish.name}
         onChange={(e) => setNewFinish({ ...newFinish, name: e.target.value })}
       />
-      <TextField
-        label="Image URL"
-        fullWidth
-        value={newFinish.image}
-        onChange={(e) => setNewFinish({ ...newFinish, image: e.target.value })}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImageFile(e.target.files[0])}  // Select the file
       />
-      <Button onClick={handleAddFinish}>Add Finish</Button>
+      <Button onClick={handleAddFinish} disabled={uploading}>Add Finish</Button>
 
       {/* Form for Adding New Color */}
       <Typography variant="h6" gutterBottom>Add New Color</Typography>
@@ -139,7 +186,7 @@ const AdminCustomizationForm = () => {
         value={newColor.colorCode}
         onChange={(e) => setNewColor({ ...newColor, colorCode: e.target.value })}
       />
-      <Button onClick={handleAddColor}>Add Color</Button>
+      <Button onClick={handleAddColor} disabled={uploading}>Add Color</Button>
 
       {/* Dialog to confirm update */}
       <Dialog open={openDialog} onClose={handleCancelUpdate}>
