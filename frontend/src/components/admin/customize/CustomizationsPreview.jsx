@@ -58,9 +58,7 @@ function CustomizationsPreview() {
   
   return (
     <div style={{ padding: '20px', maxWidth: '380px', margin: '0 auto' }}>
-      <Typography variant="h5" gutterBottom>
-        Select Options
-      </Typography>
+      <Typography variant='h4' style={{ textAlign: 'center', marginBottom: '10px' }} >Preview</Typography>
 
       <Typography variant="h6" gutterBottom>
         Material
