@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // Define the schema for Order
-const orderSchema = new mongoose.Schema({
+const cartSchema = new mongoose.Schema({
     user_id: {
         type: String, // Refers to a user from the Customer model
         // ref: 'Customer',
@@ -45,14 +45,14 @@ const orderSchema = new mongoose.Schema({
         default: Date.now  // Automatically sets the order date to current date
     },
     status: {
-        type: String,  // 1: Active, 0: Inactive/Completed
-        default: "Quotation Pending"
+        type: Number,  // 1: Active, 0: Inactive/Completed
+        default: 1
     }
 }, {
     timestamps: true  // Adds createdAt and updatedAt fields automatically
 });
 
 // Create the model using the schema
-const Order = mongoose.model('Order', orderSchema);
+const Cart = mongoose.model('Cart', cartSchema);
 
-module.exports = Order;
+module.exports = Cart;

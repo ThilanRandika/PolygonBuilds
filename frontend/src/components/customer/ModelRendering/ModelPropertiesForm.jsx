@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom'; // If using React Router
 import axios from "axios";
 import {
   TextField,
@@ -13,8 +14,11 @@ import {
   TextareaAutosize,
   Box,
 } from "@mui/material";
+import { Navigate } from "react-router-dom";
 
 const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink }) => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     quantity: "",
     material: "",
@@ -106,8 +110,9 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink })
     };
 
     try {
-      const response = await axios.post("http://localhost:8070/api/order/create-order", orderData);
+      const response = await axios.post("http://localhost:8070/api/cart/add", orderData);
       console.log("Order created:", response.data);
+      navigate("/cart");
     } catch (error) {
       console.error("Error creating order:", error);
     }
@@ -318,7 +323,7 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink })
           type="submit"
           style={{ marginTop: "20px" }}
         >
-          Submit
+          Add to Cart
         </Button>
       </form>
     </div>

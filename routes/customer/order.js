@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../../models/Order'); 
+const Cart = require('../../models/Cart');
 
 // Create a new order
 router.post('/create-order', async (req, res) => {
@@ -29,6 +30,50 @@ router.post('/create-order', async (req, res) => {
         res.status(500).json({ error: 'Error creating order' });
     }
 });
+
+
+
+// Create multiple orders (for confirming the order)
+router.post('/create-multiple-orders', async (req, res) => {
+    const { user_id, cartItems } = req.body; // Assuming cartItems is an array of items the user has selected
+
+    if (!cartItems || cartItems.length === 0) {
+        return res.status(400).json({ error: 'No items selected for order' });
+    }
+
+    try {
+        // Create orders from cart items
+        const orders = cartItems.map(item => {
+            const { model, quantity, material, color, quality, specialInstructions, infilType, verticalResolution } = item;
+            return new Order({
+                user_id,
+                model,
+                quantity,
+                material,
+                color,
+                quality,
+                specialInstructions,
+                infilType,
+                verticalResolution,
+                status: "Quotation Pending"  // New orders are 'active' by default
+            });
+        });
+
+        // Save all orders to the database
+        const savedOrders = await Order.insertMany(orders);
+
+        // After successfully creating orders, delete the cart items for the user
+        await Cart.deleteMany({ user_id, _id: { $in: cartItems.map(item => item._id) } });
+
+        res.status(201).json({ message: 'Orders created successfully and cart items deleted.', orders: savedOrders });
+    } catch (err) {
+        console.error('Error creating orders or deleting cart items:', err);
+        res.status(500).json({ error: 'Error creating orders or deleting cart items' });
+    }
+});
+
+
+
 
 
 

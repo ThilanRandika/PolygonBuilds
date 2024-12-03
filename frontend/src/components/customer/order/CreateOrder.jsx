@@ -24,7 +24,6 @@ function CreateOrder() {
 
   return (
     <>
-      <Header />
       <Box 
         sx={{
           display: 'grid',

@@ -12,6 +12,7 @@ const customizationRoute = require("./routes/admin/customization");
 
 // Import customer routes
 const orderRoute = require("./routes/customer/order");
+const cartRoute = require("./routes/customer/cart");
 
 
 const PORT = process.env.PORT || 8070;
@@ -47,6 +48,7 @@ app.use("/api/customization", customizationRoute);
 
 // Use customer routs
 app.use("/api/order", orderRoute);
+app.use("/api/cart", cartRoute);
 
 
 app.listen(PORT,() =>{
