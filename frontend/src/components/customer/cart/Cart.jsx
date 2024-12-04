@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
-const Cart = () => {
+const Cart = ({ itemId }) => {
+    const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedItems, setSelectedItems] = useState([]);
     const [quantities, setQuantities] = useState({}); // To store the selected quantities
     const [isPopupOpen, setIsPopupOpen] = useState(false); // State to manage popup visibility
+    const [expandedItems, setExpandedItems] = useState({}); // To track expanded state of items
+    const [editingItemId, setEditingItemId] = useState(null); // Track which item is being edited
 
     useEffect(() => {
         fetchCartItems();
@@ -21,6 +25,25 @@ const Cart = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const toggleExpandItem = (itemId) => {
+        setExpandedItems((prev) => ({
+            ...prev,
+            [itemId]: !prev[itemId],
+        }));
+    };
+
+
+    const handleEditConfiguration = (itemId) => {
+        setEditingItemId(itemId);
+
+        navigate('/createOrder', { state: { itemId } });
+    };
+
+    const saveEditedConfiguration = (itemId) => {
+        // Logic to save the edited configuration (e.g., make an API call)
+        setEditingItemId(null);
     };
 
     const toggleSelectItem = (itemId) => {
@@ -115,53 +138,91 @@ const Cart = () => {
                     <h2 className="text-2xl font-semibold mb-6">Your Shopping Cart</h2>
                     {cartItems.map((item) => (
                         <div className="mb-6 p-4 border border-gray-300 rounded-lg" key={item._id}>
-                            <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden shadow-lg">
-                                    <img
-                                        src={"https://img1.yeggi.com/page_images_cache/6817317_soldier-sister-dialogus-3d-printing-template-to-download-"}
-                                        alt={item.model}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                                <div className="flex-grow">
-                                    <h3 className="text-xl font-semibold">
-                                        <a href="#" className="hover:text-green-600">
-                                            {extractFileName(item.model)} {/* Display file name without 'files/' */}
-                                        </a>
-                                    </h3>
-                                    <p className="text-gray-600 text-sm">
-                                        Material: {item.material} | Color: {item.color}
-                                    </p>
-                                    <p className="text-gray-600 text-sm">
-                                        Finish: {item.quality}
-                                    </p>
-                                    <p className="text-gray-600 text-sm">
-                                        Quantity: 
-                                        <input
-                                            type="number"
-                                            value={quantities[item._id] || item.quantity} // Default quantity is the one from the DB
-                                            onChange={(e) => handleQuantityChange(item._id, e.target.value)}
-                                            min="1"
-                                            className="ml-2 w-16 text-center border rounded-lg"
-                                        />
-                                    </p>
-                                </div>
-                                <div className="flex flex-col items-end space-y-2">
+                        <div className="flex items-start space-x-4">
+                            <div className="flex-shrink-0 w-32 h-32 rounded-lg overflow-hidden shadow-lg">
+                                <img
+                                    src={"https://img1.yeggi.com/page_images_cache/6817317_soldier-sister-dialogus-3d-printing-template-to-download-"}
+                                    alt={item.model}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <div className="flex-grow">
+                                <h3 className="text-xl font-semibold">
+                                    <a href="#" className="hover:text-green-600">
+                                        {extractFileName(item.model)}
+                                    </a>
+                                </h3>
+                                <p className="text-gray-600 text-sm">
+                                    Material: {item.material} | Color: {item.color}
+                                </p>
+                                <p className="text-gray-600 text-sm">
+                                    Finish: {item.quality}
+                                </p>
+                                <p className="text-gray-600 text-sm">
+                                    Quantity:
                                     <input
-                                        type="checkbox"
-                                        checked={selectedItems.includes(item._id)}
-                                        onChange={() => toggleSelectItem(item._id)}
-                                        className="cursor-pointer"
+                                        type="number"
+                                        value={quantities[item._id] || item.quantity}
+                                        onChange={(e) => handleQuantityChange(item._id, e.target.value)}
+                                        className="ml-2 w-16 text-center border rounded-lg"
                                     />
-                                    <button
-                                        onClick={() => removeItem(item._id)}
-                                        className="text-red-500 hover:text-red-700 text-sm"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
+                                </p>
+                                <button
+                                    onClick={() => handleEditConfiguration(item._id)}
+                                    className="mt-2 text-blue-500 hover:text-blue-700 text-sm"
+                                >
+                                    Edit Configuration
+                                </button>
+                                <button
+                                    onClick={() => toggleExpandItem(item._id)}
+                                    className="mt-2 text-green-500 hover:text-green-700 text-sm ml-4"
+                                >
+                                    {expandedItems[item._id] ? 'Hide Details' : 'View Details'}
+                                </button>
+                            </div>
+                            <div className="flex flex-col items-end space-y-2">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedItems.includes(item._id)}
+                                    onChange={() => toggleSelectItem(item._id)}
+                                    className="cursor-pointer"
+                                />
+                                <button
+                                    onClick={() => removeItem(item._id)}
+                                    className="text-red-500 hover:text-red-700 text-sm"
+                                >
+                                    Remove
+                                </button>
                             </div>
                         </div>
+                        {/* Expanded details */}
+                        {expandedItems[item._id] && (
+                            <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+                                <p className="text-sm">Dimensions:</p>
+                                <ul className="text-gray-600 text-sm">
+                                    <li>Width: {item.dimensions?.width || 'N/A'} mm</li>
+                                    <li>Height: {item.dimensions?.height || 'N/A'} mm</li>
+                                    <li>Depth: {item.dimensions?.depth || 'N/A'} mm</li>
+                                </ul>
+                                <p className="text-sm">Special Instructions: {item.specialInstructions || 'None'}</p>
+                                <p className="text-sm">Infill Type: {item.infilType || 'Default'}</p>
+                                <p className="text-sm">Vertical Resolution: {item.verticalResolution || 'Standard'}</p>
+                            </div>
+                        )}
+                        {/* Edit Configuration */}
+                        {editingItemId === item._id && (
+                            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                                <h4 className="text-lg font-semibold mb-2">Edit Configuration</h4>
+                                <p className="text-sm">Adjust material, color, and more settings here.</p>
+                                <button
+                                    onClick={() => saveEditedConfiguration(item._id)}
+                                    className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                        )}
+                    </div>
                     ))}
                     <div className="mt-6">
                         <button

@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { Navigate } from "react-router-dom";
 
-const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink }) => {
+const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, itemDetails, isEditMode }) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -56,14 +56,32 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink })
   }, []);
 
   useEffect(() => {
-    // Update form data whenever selectedOptions changes
-    setFormData((prevState) => ({
-      ...prevState,
-      material: selectedOptions.material,
-      finish: selectedOptions.finish,
-      color: selectedOptions.color,
-    }));
-  }, [selectedOptions]);
+    if (isEditMode && itemDetails && Object.keys(itemDetails).length > 0) {
+      setFormData({
+        quantity: itemDetails.quantity || "",
+        material: itemDetails.material || "",
+        finish: itemDetails.finish || "",
+        color: itemDetails.color || "",
+        specialInstructions: itemDetails.specialInstructions || "",
+        verticalResolution: itemDetails.verticalResolution || "",
+        verticalResolutionLetTeamDecide: itemDetails.verticalResolutionLetTeamDecide || false,
+        infilType: itemDetails.infilType || "",
+        infilTypeLetTeamDecide: itemDetails.infilTypeLetTeamDecide || false,
+      });
+    }
+  }, [isEditMode, itemDetails]);
+
+  // Update formData whenever selectedOptions change (only if not in edit mode)
+  useEffect(() => {
+    if (!isEditMode) {
+      setFormData((prevState) => ({
+        ...prevState,
+        material: selectedOptions.material,
+        finish: selectedOptions.finish,
+        color: selectedOptions.color,
+      }));
+    }
+  }, [selectedOptions, isEditMode]);
   
 
   const handleInputChange = (e) => {
@@ -323,7 +341,7 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink })
           type="submit"
           style={{ marginTop: "20px" }}
         >
-          Add to Cart
+          {isEditMode ? "Save Configurations" : "Add to Cart"}
         </Button>
       </form>
     </div>

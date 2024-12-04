@@ -39,4 +39,27 @@ router.get('/all-cart', async (req, res) => {
     }
 });
 
+// Get a single cart item by cart ID
+router.get('/cartItem/:id', async (req, res) => {
+    const cartId = req.params.id;
+
+    try {
+        // Find the cart item by its ID
+        const cartItem = await Cart.findById(cartId);
+
+        // If the cart item is not found
+        if (!cartItem) {
+            return res.status(404).json({ error: 'Cart item not found' });
+        }
+
+        // Return the cart item
+        res.status(200).json(cartItem);
+    } catch (err) {
+        console.error('Error fetching cart item:', err.message);
+        res.status(500).json({ error: 'Error fetching cart item' });
+    }
+});
+
+
+
 module.exports = router;
