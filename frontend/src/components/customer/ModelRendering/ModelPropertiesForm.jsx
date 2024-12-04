@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { Navigate } from "react-router-dom";
 
-const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, itemDetails, isEditMode }) => {
+const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, itemDetails, isEditMode, cartId }) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -107,7 +107,7 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Create the order data with the actual STL model link
     const orderData = {
       user_id: "user_id_placeholder", // Replace with actual user ID
@@ -117,24 +117,33 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
       color: formData.color,
       quality: formData.finish,
       specialInstructions: formData.specialInstructions,
-      // If the checkbox is checked, send "Let our team decide" instead of the selected value
-    verticalResolution: formData.verticalResolutionLetTeamDecide
-    ? "Let our team decide"
-    : formData.verticalResolution,
-
-  infilType: formData.infilTypeLetTeamDecide
-    ? "Let our team decide"
-    : formData.infilType,
+      verticalResolution: formData.verticalResolutionLetTeamDecide
+        ? "Let our team decide"
+        : formData.verticalResolution,
+      infilType: formData.infilTypeLetTeamDecide
+        ? "Let our team decide"
+        : formData.infilType,
     };
-
+  
     try {
-      const response = await axios.post("http://localhost:8070/api/cart/add", orderData);
-      console.log("Order created:", response.data);
+      let response;
+      if (isEditMode) {
+        // Update cart item route when in edit mode
+        response = await axios.put(`http://localhost:8070/api/cart/update/${cartId}`, orderData);
+        console.log("Cart item updated:", response.data);
+      } else {
+        // Add to cart route when not in edit mode
+        response = await axios.post("http://localhost:8070/api/cart/add", orderData);
+        console.log("Order created:", response.data);
+      }
+  
       navigate("/cart");
+      // After the operation, navigate to the cart page
     } catch (error) {
-      console.error("Error creating order:", error);
+      console.error("Error handling the order:", error);
     }
   };
+  
 
 
   if (isLoading) return <p>Loading...</p>;

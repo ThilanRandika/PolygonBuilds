@@ -18,12 +18,14 @@ function CreateOrder() {
   const [modelLink, setModelLink] = useState(''); // Store the model link here
   const [isEditMode, setIsEditMode] = useState(false);
   const [itemDetails, setItemDetails] = useState(null); // Set to null initially
+  const [cartId, setCartId] = useState(null); // Set to null initially
 
   // Fetch item details when itemId is available
   useEffect(() => {
     if (location.state?.itemId) {
       const { itemId } = location.state;
       setIsEditMode(true);
+      setCartId(itemId);
       fetchCartItem(itemId);
     }
   }, [location.state]);
@@ -99,6 +101,7 @@ function CreateOrder() {
           modelLink={modelLink}
           itemDetails={itemDetails}
           isEditMode={isEditMode} // Pass the isEditMode state to ModelPropertiesForm
+          cartId={cartId}
         />
 
         </Box>

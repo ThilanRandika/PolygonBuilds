@@ -60,6 +60,51 @@ router.get('/cartItem/:id', async (req, res) => {
     }
 });
 
+// Update a single cart item by cart ID
+router.put('/update/:id', async (req, res) => {
+    const cartId = req.params.id;
+    const {
+        quantity,
+        material,
+        color,
+        quality,
+        specialInstructions,
+        infilType,
+        verticalResolution,
+    } = req.body;
+
+    try {
+        // Find the cart item by ID and update its details
+        const updatedCartItem = await Cart.findByIdAndUpdate(
+            cartId,
+            {
+                $set: {
+                    quantity,
+                    material,
+                    color,
+                    quality,
+                    specialInstructions,
+                    infilType,
+                    verticalResolution,
+                },
+            },
+            { new: true } // Return the updated document
+        );
+
+        // If no cart item was found with the given ID
+        if (!updatedCartItem) {
+            return res.status(404).json({ error: 'Cart item not found' });
+        }
+
+        // Return the updated cart item
+        res.status(200).json({ message: 'Cart item updated successfully', cartItem: updatedCartItem });
+    } catch (err) {
+        console.error('Error updating cart item:', err.message);
+        res.status(500).json({ error: 'Error updating cart item' });
+    }
+});
+
+
 
 
 module.exports = router;
