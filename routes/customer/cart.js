@@ -104,6 +104,27 @@ router.put('/update/:id', async (req, res) => {
     }
 });
 
+// Delete a single cart item by cart ID
+router.delete('/delete/:id', async (req, res) => {
+    const cartId = req.params.id;
+
+    try {
+        // Find the cart item by its ID and delete it
+        const deletedCartItem = await Cart.findByIdAndDelete(cartId);
+
+        // If no cart item was found with the given ID
+        if (!deletedCartItem) {
+            return res.status(404).json({ error: 'Cart item not found' });
+        }
+
+        // Return a success message
+        res.status(200).json({ message: 'Cart item deleted successfully', cartItem: deletedCartItem });
+    } catch (err) {
+        console.error('Error deleting cart item:', err.message);
+        res.status(500).json({ error: 'Error deleting cart item' });
+    }
+});
+
 
 
 

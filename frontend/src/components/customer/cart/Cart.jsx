@@ -56,7 +56,7 @@ const Cart = ({ itemId }) => {
 
     const removeItem = async (itemId) => {
         try {
-            await axios.delete(`/customer/cart/remove/${itemId}`);
+            await axios.delete(`http://localhost:8070/api/cart/delete/${itemId}`);
             setCartItems(cartItems.filter((item) => item._id !== itemId));
             setQuantities((prevQuantities) => {
                 const newQuantities = { ...prevQuantities };
