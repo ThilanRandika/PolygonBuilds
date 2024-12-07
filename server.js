@@ -9,6 +9,7 @@ require("dotenv").config();
 
 // Import admin routes
 const customizationRoute = require("./routes/admin/customization");
+const adminOrderRoute = require("./routes/admin/order");
 
 // Import customer routes
 const orderRoute = require("./routes/customer/order");
@@ -45,6 +46,7 @@ connection.once("open", ()=> {
 
 // Use admin routs
 app.use("/api/customization", customizationRoute);
+app.use("/api/adminOrder", adminOrderRoute);
 
 // Use customer routs
 app.use("/api/order", orderRoute);
