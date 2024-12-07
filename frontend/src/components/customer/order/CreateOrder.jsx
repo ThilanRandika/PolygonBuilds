@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import Header from "../header/Header";
 import ModelPropertiesForm from "../ModelRendering/ModelPropertiesForm";
 import SelectionOptions from "../ModelRendering/SelectionOptions";
 import STLViewer from "../ModelRendering/STLViewer";
 import { Box } from '@mui/material';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
+import ConfigurationHeader from "../header/ConfigurationHeader";
+import ConfigurationHeader2 from "../header/ConfigurationHeader2";
 
 function CreateOrder() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [selectedOptions, setSelectedOptions] = useState({
     material: '',
     finish: '',
@@ -49,7 +49,6 @@ function CreateOrder() {
     }
   }, [itemDetails, modelLink]);
 
-
   // Function to update selected options
   const handleOptionSelect = (category, option) => {
     setSelectedOptions((prevState) => ({
@@ -58,8 +57,13 @@ function CreateOrder() {
     }));
   };
 
+
   return (
     <>
+      
+
+              <ConfigurationHeader2/>
+              <ConfigurationHeader cartId={cartId}/>
       <Box 
         sx={{
           display: 'grid',
@@ -94,16 +98,14 @@ function CreateOrder() {
             maxHeight: '100vh' // Restrict height to viewport height
           }}
         >
-          {/* Pass selected options as props */}
           <ModelPropertiesForm
-          selectedOptions={selectedOptions}
-          handleOptionSelect={handleOptionSelect}
-          modelLink={modelLink}
-          itemDetails={itemDetails}
-          isEditMode={isEditMode} // Pass the isEditMode state to ModelPropertiesForm
-          cartId={cartId}
-        />
-
+            selectedOptions={selectedOptions}
+            handleOptionSelect={handleOptionSelect}
+            modelLink={modelLink}
+            itemDetails={itemDetails}
+            isEditMode={isEditMode} // Pass the isEditMode state to ModelPropertiesForm
+            cartId={cartId}
+          />
         </Box>
 
         {/* Right Column - SelectionOptions (Fixed) */}
@@ -118,7 +120,6 @@ function CreateOrder() {
             overflow: 'auto' // Enable scroll if content exceeds height
           }}
         >
-          {/* Pass the handler and selected options as props */}
           <SelectionOptions
             selectedOptions={selectedOptions}
             handleOptionSelect={handleOptionSelect}
