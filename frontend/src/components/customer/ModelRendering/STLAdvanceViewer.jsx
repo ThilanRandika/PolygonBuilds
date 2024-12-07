@@ -278,13 +278,13 @@ const STLAdvanceViewer = () => {
       if (isEnabled) {
         // Enable transparent mode with glowing effect
         mesh.material.transparent = true; 
-        mesh.material.opacity = 0.3; // Semi-transparent
+        mesh.material.opacity = 0.5; // Semi-transparent
         mesh.material.color.set(0xffffff); // Light gray or white
         mesh.material.reflectivity = 0.3; // Subtle shine
         mesh.material.clearcoat = 1.0; // High clear coat for polish
         mesh.material.clearcoatRoughness = 0.1; // Smooth clear coat
-        mesh.material.emissive.set(0x888888); // Add a soft glow
-        mesh.material.emissiveIntensity = 0.4; // Glow intensity
+        mesh.material.emissive.set(0x000000); // Add a soft glow
+        mesh.material.emissiveIntensity = 0.3; // Glow intensity
         mesh.material.side = THREE.DoubleSide; // Render both sides for transparency
   
         // Set dark background for better glow visibility
