@@ -6,6 +6,9 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import defaultImage from '../../../assets/images/default3DModel.png';
 
 function OrderCard({ order }) {
@@ -21,6 +24,15 @@ function OrderCard({ order }) {
     quantity,
     status,
   } = order;
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleDropDownClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleDropDownClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <Card sx={{ display: 'flex', flexDirection: 'column', p: 2, boxShadow: 3, borderRadius: 2, my: 2 }}>
@@ -57,18 +69,23 @@ function OrderCard({ order }) {
           alt="Product"
           sx={{ width: 64, height: 64, borderRadius: 1 }}
         />
-        <Box sx={{ flex: 2 }}>
+        <Box sx={{ flex: 3 }}>
           <Typography variant="body1" fontWeight="bold">
             {productName}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {productDetails.colorFamily}
+            Color Family: {productDetails.colorFamily}
           </Typography>
         </Box>
         <Box sx={{ flex: 1 }}>
-          <Typography variant="body1" color="grey" >
-            Rs. {price}
-          </Typography>
+          {price ? (
+            <Typography variant="body1" color="grey">
+              Rs. {price}
+            </Typography>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+            </Typography>
+          )}
           <Typography variant="body1" color="error.main" fontWeight="bold">
             X {quantity}
           </Typography>
@@ -78,9 +95,50 @@ function OrderCard({ order }) {
             <Button variant="outlined" color="primary" size="small">
               Logistic Status
             </Button>
-            <Button variant="outlined" color="primary" size="small">
-              More Action
-            </Button>
+            <div>
+              <Button
+                id="basic-button"
+                aria-controls={open ? 'basic-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? 'true' : undefined}
+                onClick={handleDropDownClick}
+                variant="outlined" 
+                color="primary" 
+                size="small"
+                sx={{ width: '100%' }}
+              >
+                More Actions <KeyboardArrowDownIcon />
+              </Button>
+              <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleDropDownClose}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button',
+                }}
+              >
+                {/* Conditional rendering for "Add Quotation" */}
+                {status === 'Quotation Pending' && (
+                  <MenuItem onClick={() => {
+                    handleDropDownClose();
+                    console.log('Add Quotation clicked');
+                  }}>
+                    Add Quotation
+                  </MenuItem>
+                )}
+                {/* Conditional rendering for "Add Quotation" */}
+                {status === 'To Pack' && (
+                  <MenuItem onClick={() => {
+                    handleDropDownClose();
+                    console.log('Ready To Ship');
+                  }}>
+                    Add Quotation
+                  </MenuItem>
+                )}
+              </Menu>
+
+            </div>
           </Box>
         </Box>
       </Box>
@@ -108,7 +166,7 @@ OrderCard.propTypes = {
     productDetails: PropTypes.shape({
       colorFamily: PropTypes.string.isRequired,
     }).isRequired,
-    price: PropTypes.number.isRequired,
+    price: PropTypes.number,
     quantity: PropTypes.number.isRequired,
     status: PropTypes.string.isRequired,
   }).isRequired,

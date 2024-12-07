@@ -11,9 +11,9 @@ function AllOrders() {
     // productImage: '/path/to/cable-image.png',
     productName: 'basket 3D model',
     productDetails: {
-      colorFamily: 'Color Family: Grey'
+      colorFamily: 'Grey'
     },
-    price: 1056.0,
+    // price: 1056.0,
     quantity: 2,
     status: 'Quotation Pending',
   };
