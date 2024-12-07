@@ -1,10 +1,10 @@
 import React from 'react'
 import ProcessingTabs from './ProcessingTabs'
 
-function Processing() {
+function Processing({ orders }) {
   return (
     <div>
-        <ProcessingTabs />
+        <ProcessingTabs orders={orders} />
     </div>
   )
 }

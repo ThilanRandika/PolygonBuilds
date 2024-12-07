@@ -38,7 +38,7 @@ function a11yProps(index) {
   };
 }
 
-export default function OrderTabs() {
+export default function OrderTabs({ orders }) {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
@@ -50,6 +50,18 @@ export default function OrderTabs() {
     event.preventDefault();
     setValue(3); // Assuming 3 is the index for the "All Orders" tab
   };
+
+  // Filter orders by status
+  const pendingOrders = orders.filter(
+    (order) => order.status === 'Quotation Pending' || order.status === 'Payment Pending'
+  );  
+  const processingOrders = orders.filter(
+    (order) => order.status === 'To Pack' || order.status === 'Ready To Ship' || order.status === 'Shipping'
+  );
+  const completedOrders = orders.filter(
+    (order) => order.status === 'Delivered' || order.status === 'Failed Delivery' || order.status === 'Cancelled' || order.status === 'Rejected'
+  );
+    
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -83,16 +95,16 @@ export default function OrderTabs() {
 
       {/* Tab Panels */}
       <CustomTabPanel value={value} index={0}>
-        <Pending />
+        <Pending orders={pendingOrders} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        <Processing />
+        <Processing orders={processingOrders} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
-        <Completed />
+        <Completed orders={completedOrders} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
-        <AllOrders />
+        <AllOrders orders={orders} />
       </CustomTabPanel>
     </Box>
   );

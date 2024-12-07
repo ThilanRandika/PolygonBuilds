@@ -1,10 +1,10 @@
 import React from 'react'
 import CompletedTabs from './CompletedTabs'
 
-function Completed() {
+function Completed({ orders }) {
   return (
     <div>
-        <CompletedTabs />
+        <CompletedTabs orders={orders} />
     </div>
   )
 }

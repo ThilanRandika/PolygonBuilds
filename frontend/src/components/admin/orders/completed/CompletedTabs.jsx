@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import Delivered from './Delivered';
+import FailedDelivery from './FailedDelivery';
+import Cancelled from './Cancelled';
+import Rejected from './Rejected';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -33,12 +37,25 @@ function a11yProps(index) {
   };
 }
 
-export default function CompletedTabs() {
+export default function CompletedTabs({ orders }) {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const deliveredOrders = orders.filter(
+    (order) => order.status === 'Delivered'
+  );
+  const failedDeliveryOrders = orders.filter(
+    (order) => order.status === 'Failed Delivery'
+  );
+  const cancelledOrders = orders.filter(
+    (order) => order.status === 'Cancelled'
+  );
+  const rejectedOrders = orders.filter(
+    (order) => order.status === 'Rejected'
+  );
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -94,16 +111,16 @@ export default function CompletedTabs() {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        sdfsf
+        <Delivered orders={deliveredOrders} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        Item Two
+        <FailedDelivery orders={failedDeliveryOrders} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
-        Item Three
+        <Cancelled orders={cancelledOrders} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
-        Item Three
+        <Rejected orders={rejectedOrders} />
       </CustomTabPanel>
     </Box>
   );

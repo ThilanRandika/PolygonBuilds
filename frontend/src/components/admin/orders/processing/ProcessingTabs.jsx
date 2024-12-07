@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import ToPack from './ToPack';
+import ReadyToShip from './ReadyToShip';
+import Shipping from './Shipping';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -33,12 +36,23 @@ function a11yProps(index) {
   };
 }
 
-export default function ProcessingTabs() {
+export default function ProcessingTabs({ orders }) {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  // Filter orders by status
+  const toPackOrders = orders.filter(
+    (order) => order.status === 'To Pack'
+  );
+  const ReadyToShipOrders = orders.filter(
+    (order) => order.status === 'Ready To Ship'
+  );
+  const shippingOrders = orders.filter(
+    (order) => order.status === 'Shipping'
+  );
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -84,13 +98,13 @@ export default function ProcessingTabs() {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        sdfsf
+        <ToPack orders={toPackOrders} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        Item Two
+        <ReadyToShip orders={ReadyToShipOrders} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={2}>
-        Item Three
+        <Shipping orders={shippingOrders} />
       </CustomTabPanel>
     </Box>
   );

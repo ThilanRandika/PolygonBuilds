@@ -2,28 +2,19 @@ import { Box, Typography } from '@mui/material'
 import React from 'react'
 import OrderCard from '../OrderCard'
 
-function AllOrders() {
-  const orderData = {
-    customerName: 'Sandaru Weerasekara',
-    itemsCount: '1',
-    orderNumber: '217420687896485',
-    updateTime: '02 Dec 2024 12:09',
-    // productImage: '/path/to/cable-image.png',
-    productName: 'basket 3D model',
-    productDetails: {
-      colorFamily: 'Grey'
-    },
-    // price: 1056.0,
-    quantity: 2,
-    status: 'Quotation Pending',
-  };
+function AllOrders({ orders }) {
 
   return (
     <div>
         <Box>
             <Typography>All Orders</Typography>
         </Box>
-        <OrderCard order={orderData} />
+        {/* Order Cards */}
+        <Box sx={{ p: 2, width: '100%' }}>
+          {orders.map((order, index) => (
+            <OrderCard key={index} order={order} />
+          ))}
+        </Box>
     </div>
   )
 }

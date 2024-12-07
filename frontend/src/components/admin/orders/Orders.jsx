@@ -23,7 +23,7 @@ const Orders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://localhost:8070/api/order/all-orders');
+        const response = await axios.get('http://localhost:8070/api/adminOrder/all-orders');
         setOrders(response.data);
       } catch (error) {
         console.error('Error fetching orders:', error);
@@ -50,7 +50,7 @@ const Orders = () => {
         </div>
         
         <div>
-          <OrderTabs />
+          <OrderTabs orders={orders} />
         </div>
       </div>
 

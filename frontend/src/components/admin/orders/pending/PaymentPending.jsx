@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import OrderCard from '../OrderCard';
 
-function QuotationPending({ orders }) {
+function PaymentPending({ orders }) {
   return (
     <div>
         {/* Order Cards */}
@@ -15,4 +15,4 @@ function QuotationPending({ orders }) {
   );
 }
 
-export default QuotationPending;
+export default PaymentPending;

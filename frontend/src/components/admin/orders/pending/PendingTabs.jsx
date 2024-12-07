@@ -4,6 +4,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import QuotationPending from './QuotationPending';
+import PaymentPending from './PaymentPending';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -34,12 +35,20 @@ function a11yProps(index) {
   };
 }
 
-export default function PendingTabs() {
+export default function PendingTabs({ orders }) {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  // Filter orders by status
+  const QuotationPendingOrders = orders.filter(
+    (order) => order.status === 'Quotation Pending'
+  );  
+  const paymentPendingOrders = orders.filter(
+    (order) => order.status === 'Payment Pending'
+  );
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -76,10 +85,10 @@ export default function PendingTabs() {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        <QuotationPending />
+        <QuotationPending orders={QuotationPendingOrders} />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
-        Item Two
+        <PaymentPending orders={paymentPendingOrders} />
       </CustomTabPanel>
     </Box>
   );

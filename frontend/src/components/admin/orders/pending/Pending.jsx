@@ -1,10 +1,10 @@
 import React from 'react'
 import PendingTabs from './PendingTabs'
 
-function Pending() {
+function Pending({ orders }) {
   return (
     <div>
-        <PendingTabs />
+        <PendingTabs orders={orders} />
     </div>
   )
 }

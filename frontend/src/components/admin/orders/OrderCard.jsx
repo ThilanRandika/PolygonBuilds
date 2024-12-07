@@ -74,7 +74,7 @@ function OrderCard({ order }) {
             {productName}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Color Family: {productDetails.colorFamily}
+            Color Family: {productDetails?.colorFamily || 'Not Specified'}
           </Typography>
         </Box>
         <Box sx={{ flex: 1 }}>
@@ -157,18 +157,18 @@ function OrderCard({ order }) {
 
 OrderCard.propTypes = {
   order: PropTypes.shape({
-    customerName: PropTypes.string.isRequired,
-    itemsCount: PropTypes.string.isRequired,
-    orderNumber: PropTypes.string.isRequired,
-    updateTime: PropTypes.string.isRequired,
+    customerName: PropTypes.string,
+    itemsCount: PropTypes.string,
+    orderNumber: PropTypes.string,
+    updateTime: PropTypes.string,
     productImage: PropTypes.string,
-    productName: PropTypes.string.isRequired,
+    productName: PropTypes.string,
     productDetails: PropTypes.shape({
-      colorFamily: PropTypes.string.isRequired,
-    }).isRequired,
+      colorFamily: PropTypes.string,
+    }),
     price: PropTypes.number,
-    quantity: PropTypes.number.isRequired,
-    status: PropTypes.string.isRequired,
+    quantity: PropTypes.number,
+    status: PropTypes.string,
   }).isRequired,
 };
 
