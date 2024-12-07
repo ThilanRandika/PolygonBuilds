@@ -33,10 +33,6 @@ function a11yProps(index) {
   };
 }
 
-
-
-
-
 export default function CompletedTabs() {
   const [value, setValue] = React.useState(0);
 
@@ -46,12 +42,55 @@ export default function CompletedTabs() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box >
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" >
-          <Tab label="Delivered" {...a11yProps(0)} />
-          <Tab label="Failed Delivery" {...a11yProps(1)} />
-          <Tab label="Cancelled" {...a11yProps(2)} />
-          <Tab label="Rejected" {...a11yProps(2)} />
+      <Box>
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label="completed tabs example"
+          TabIndicatorProps={{
+            style: { backgroundColor: '#ff5733' }, // Underline color
+          }}
+        >
+          <Tab
+            label="Delivered"
+            {...a11yProps(0)}
+            sx={{
+              color: '#000', // Default text color
+              '&.Mui-selected': {
+                color: '#C70039', // Selected tab text color
+              },
+            }}
+          />
+          <Tab
+            label="Failed Delivery"
+            {...a11yProps(1)}
+            sx={{
+              color: '#000',
+              '&.Mui-selected': {
+                color: '#C70039',
+              },
+            }}
+          />
+          <Tab
+            label="Cancelled"
+            {...a11yProps(2)}
+            sx={{
+              color: '#000',
+              '&.Mui-selected': {
+                color: '#C70039',
+              },
+            }}
+          />
+          <Tab
+            label="Rejected"
+            {...a11yProps(3)}
+            sx={{
+              color: '#000',
+              '&.Mui-selected': {
+                color: '#C70039',
+              },
+            }}
+          />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import QuotationPending from './QuotationPending';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -33,10 +34,6 @@ function a11yProps(index) {
   };
 }
 
-
-
-
-
 export default function PendingTabs() {
   const [value, setValue] = React.useState(0);
 
@@ -46,14 +43,40 @@ export default function PendingTabs() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box >
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" >
-          <Tab label="Quotation Pending" {...a11yProps(0)} />
-          <Tab label="Payment Pending" {...a11yProps(1)} />
+      <Box>
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label="basic tabs example"
+          TabIndicatorProps={{
+            style: { backgroundColor: '#ff5733' }, // Underline color
+          }}
+          textColor="inherit"
+        >
+          <Tab
+            label="Quotation Pending"
+            {...a11yProps(0)}
+            sx={{
+              color: '#000', // Default color
+              '&.Mui-selected': {
+                color: '#C70039', // Selected tab color
+              },
+            }}
+          />
+          <Tab
+            label="Payment Pending"
+            {...a11yProps(1)}
+            sx={{
+              color: '#000', // Default color
+              '&.Mui-selected': {
+                color: '#C70039', // Selected tab color
+              },
+            }}
+          />
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        sdfsf
+        <QuotationPending />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         Item Two
