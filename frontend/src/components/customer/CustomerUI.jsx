@@ -5,6 +5,7 @@ import Cart from './cart/Cart'
 import { Route, Routes } from 'react-router-dom'
 import CreateOrder from './order/CreateOrder'
 import STLAdvanceViewer from './ModelRendering/STLAdvanceViewer'
+import Orders from './order/orders/Orders'
 
 function CustomerUI() {
   return (
@@ -15,6 +16,7 @@ function CustomerUI() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/createOrder" element={<CreateOrder />} />
               <Route path="/stl-Advance-viewer" element={<STLAdvanceViewer />} />
+              <Route path="/orders" element={<Orders />} />
             </Routes>
       <Footer />
     </div>

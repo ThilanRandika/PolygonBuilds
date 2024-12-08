@@ -90,4 +90,20 @@ router.get('/all-orders', async (req, res) => {
 
 
 
+// Get all orders for a specific user
+router.get('/user-orders/:user_id', async (req, res) => {
+    const userId = req.params.user_id; // Extract user_id from route parameter
+
+    try {
+        // Find all orders associated with the given user_id
+        const orders = await Order.find({ user_id: userId }).sort({ date: -1 });
+        res.status(200).json(orders);
+    } catch (err) {
+        console.error('Error fetching user orders:', err);
+        res.status(500).json({ error: 'Failed to fetch user orders' });
+    }
+});
+
+
+
 module.exports = router;

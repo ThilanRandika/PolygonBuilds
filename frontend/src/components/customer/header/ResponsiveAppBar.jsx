@@ -15,7 +15,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { useNavigate } from 'react-router-dom';
 
 const pages = ['Home', 'About Us', 'Contact', 'Gallery', 'Place Order', 'Cart'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings = ['Profile', 'Orders', 'Dashboard', 'Logout'];
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -36,9 +36,14 @@ function ResponsiveAppBar() {
     }
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (path) => {
     setAnchorElUser(null);
+    if (path) {
+      console.log(`Navigating to: ${path}`); // Debugging
+      navigate(path);
+    }
   };
+  
 
   return (
     <AppBar position="static">
@@ -141,10 +146,20 @@ function ResponsiveAppBar() {
                 horizontal: 'right',
               }}
               open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
+              onClose={() => handleCloseUserMenu(null)}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem
+                  key={setting}
+                  onClick={() =>
+                    handleCloseUserMenu(
+                      setting === 'Orders' ? '/orders' :
+                      setting === 'Dashboard' ? '/dashboard' :
+                      setting === 'Logout' ? '/logout' : 
+                      null
+                    )
+                  }
+                >
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
