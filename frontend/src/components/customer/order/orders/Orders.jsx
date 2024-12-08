@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Typography } from '@mui/material';
+import OrderTabs from '../../../customer/order/orders/OrderTabs';
 
 function Orders() {
   const UserID = 'userId';
@@ -11,7 +12,7 @@ function Orders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://localhost:8070/api/order/user-orders/${UserID}');
+        const response = await axios.get(`http://localhost:8070/api/order/user-orders/${UserID}`);
         setOrders(response.data);
       } catch (error) {
         console.error('Error fetching orders:', error);
@@ -31,7 +32,19 @@ function Orders() {
   if (error) return <p>{error}</p>; // Show error message if there's an error
 
   return (
-    <div>Orders </div>
+    <>
+      <div>
+        <div>
+          <Typography variant="h4" gutterBottom>
+            Order Management
+          </Typography>
+        </div>
+        
+        <div>
+          <OrderTabs orders={orders} />
+        </div>
+      </div>
+    </>
   )
 }
 
