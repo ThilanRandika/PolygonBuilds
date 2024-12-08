@@ -9,7 +9,7 @@ import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import defaultImage from '../../../assets/images/default3DModel.png';
+import defaultImage from '../../../../assets/images/default3DModel.png';
 
 function OrderCard({ order }) {
   const {
@@ -118,24 +118,16 @@ function OrderCard({ order }) {
                   'aria-labelledby': 'basic-button',
                 }}
               >
-                {/* Conditional rendering for "Add Quotation" */}
-                {status === 'Quotation Pending' && (
+                {/* Conditional rendering for "make payment" */}
+                {status === 'Payment Pending' && (
                   <MenuItem onClick={() => {
                     handleDropDownClose();
-                    console.log('Add Quotation clicked');
+                    console.log('Add payment clicked');
                   }}>
-                    Add Quotation
+                    Make Payment
                   </MenuItem>
                 )}
-                {/* Conditional rendering for "RTS" */}
-                {status === 'To Pack' && (
-                  <MenuItem onClick={() => {
-                    handleDropDownClose();
-                    console.log('Ready To Ship');
-                  }}>
-                    Ready To Ship
-                  </MenuItem>
-                )}
+                
               </Menu>
 
             </div>
