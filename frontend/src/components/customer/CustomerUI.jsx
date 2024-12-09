@@ -1,11 +1,12 @@
 import Header from './header/Header'
 import Footer from './footer/Footer'
-import FileUpload from './ModelRendering/FileUpload'
 import Cart from './cart/Cart'
 import { Route, Routes } from 'react-router-dom'
-import CreateOrder from './order/CreateOrder'
-import STLAdvanceViewer from './ModelRendering/STLAdvanceViewer'
 import Orders from './order/orders/Orders'
+import FileUpload from './fileUpload/FileUpload'
+import ModelConfiguration from './ModelRendering/3Dprinting/ModelConfigurations/ModelConfiguration'
+import STLAdvanceViewer from './ModelRendering/3Dprinting/modelAnalysis/STLAdvanceViewer'
+import ThreeDModel from './ModelRendering/3Dprinting/ThreeDModel'
 
 function CustomerUI() {
   return (
@@ -14,8 +15,7 @@ function CustomerUI() {
             <Routes>
               <Route path="/" element={<FileUpload />} />
               <Route path="/cart" element={<Cart />} />
-              <Route path="/createOrder" element={<CreateOrder />} />
-              <Route path="/stl-Advance-viewer" element={<STLAdvanceViewer />} />
+              <Route path="/3dmodel/*" element={<ThreeDModel />} />
               <Route path="/orders" element={<Orders />} />
             </Routes>
       <Footer />

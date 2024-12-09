@@ -1,24 +1,24 @@
-import { useEffect, useState } from "react";
-import ModelPropertiesForm from "../ModelRendering/ModelPropertiesForm";
-import SelectionOptions from "../ModelRendering/SelectionOptions";
-import STLViewer from "../ModelRendering/STLViewer";
+import { useContext, useEffect, useState } from "react";
+import ModelPropertiesForm from "./ModelPropertiesForm";
+import SelectionOptions from "./SelectionOptions";
+import STLViewer from "../modelAnalysis/STLViewer";
 import { Box } from '@mui/material';
 import { useLocation } from "react-router-dom";
 import axios from "axios";
-import ConfigurationHeader from "../header/ConfigurationHeader";
-import ConfigurationHeader2 from "../header/ConfigurationHeader2";
+import ConfigurationHeader from "../../../header/ConfigurationHeader";
+import { ModelContext } from "../../../../../../context/ModelContext";
 
-function CreateOrder() {
+function ModelConfiguration() {
   const location = useLocation();
   const [selectedOptions, setSelectedOptions] = useState({
     material: '',
     finish: '',
     color: '',
   });
-  const [modelLink, setModelLink] = useState(''); // Store the model link here
   const [isEditMode, setIsEditMode] = useState(false);
   const [itemDetails, setItemDetails] = useState(null); // Set to null initially
   const [cartId, setCartId] = useState(null); // Set to null initially
+  const { setModelLink, modelLink } = useContext(ModelContext);
 
   // Fetch item details when itemId is available
   useEffect(() => {
@@ -60,10 +60,7 @@ function CreateOrder() {
 
   return (
     <>
-      
-
-              <ConfigurationHeader2/>
-              <ConfigurationHeader cartId={cartId}/>
+      <ConfigurationHeader cartId={cartId}/>
       <Box 
         sx={{
           display: 'grid',
@@ -85,7 +82,7 @@ function CreateOrder() {
             overflow: 'auto' // Enable scroll if content exceeds height
           }}
         >
-          <STLViewer setModelLink={setModelLink} /> {/* Pass setModelLink to STLViewer */}
+          <STLViewer /> {/* Pass setModelLink to STLViewer */}
         </Box>
 
         {/* Middle Column - ModelPropertiesForm (Scrollable) */}
@@ -130,4 +127,4 @@ function CreateOrder() {
   );
 }
 
-export default CreateOrder;
+export default ModelConfiguration;
