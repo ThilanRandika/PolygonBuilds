@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Customization = require("../../models/admin/Customization");
+const Customization = require("../../models/Customization");
 
 // Route to check if a specific customization exists
 router.post("/check-existence", async (req, res) => {
