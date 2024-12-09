@@ -3,23 +3,15 @@ import {
   Box,
   Typography,
   Input,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
-  IconButton,
-  TextField,
-  LinearProgress,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../../firebase/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import { ModelContext } from '../../../../context/ModelContext';
 import axios from 'axios';
+import ProgressDialog from './popups/ProgressDialog';
+import ExplanationDialog from './popups/ExplanationDialog';
 
 const FileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -31,6 +23,7 @@ const FileUpload = () => {
   const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
   const { setModelLink } = useContext(ModelContext);
+  const { setFileId } = useContext(ModelContext);
   
 
   // Handle file selection
@@ -87,7 +80,8 @@ const FileUpload = () => {
             console.log('File saved successfully:', response.data);
             // Optionally, use response.data.file.id or other data from the response
             setModelLink(downloadURL); // Update context with the file link
-            navigate('/3dmodel/stl-Advance-viewer', { state: { data: response.data } });
+            setFileId(response.data.file.id);
+            navigate('/3dmodel/stl-Advance-viewer');
           } else {
             console.error('Failed to save file:', response.data.error);
           }
@@ -145,232 +139,20 @@ const FileUpload = () => {
       </label>
 
       {/* Explanation Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>
-          Privacy Guarantee
-          <IconButton
-            aria-label="close"
-            onClick={() => setOpenDialog(false)}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          {!isEmailMode ? (
-            <>
-            {/* Dialog Content */}
-            <DialogContent
-              sx={{
-                width: '900px', // Set a custom increased width
-                maxWidth: '100%', // Prevent it from breaking the viewport boundaries on smaller devices
-                textAlign: 'left',
-                mx: 'auto',
-                p: 3,
-                overflow: 'hidden', // Prevent scrollbars
-              }}
-            >
-              {/* Description with bold highlights */}
-              <DialogContentText
-                sx={{
-                  fontSize: '1rem',
-                  color: '#4a4a4a',
-                  mb: 3,
-                }}
-              >
-                We guarantee that your uploaded files will remain private. For added security, you can{' '}
-                <Typography
-                  component="span"
-                  sx={{ fontWeight: 'bold', display: 'inline' }}
-                >
-                  log in
-                </Typography>{' '}
-                or{' '}
-                <Typography
-                  component="span"
-                  sx={{ fontWeight: 'bold', display: 'inline' }}
-                >
-                  proceed with an email address
-                </Typography>{' '}
-                for communication.
-              </DialogContentText>
-          
-              {/* Dialog Actions */}
-              <DialogActions
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  flexDirection: { xs: 'column', sm: 'row' },
-                  gap: 2,
-                }}
-              >
-                {/* Log In Button */}
-                <Button
-                  onClick={() => {
-                    setOpenDialog(false);
-                    navigate('/login');
-                  }}
-                  color="primary"
-                  variant="contained"
-                  sx={{
-                    flex: 1,
-                    textTransform: 'none',
-                    height: '48px',
-                    backgroundColor: '#3b82f6',
-                    '&:hover': {
-                      backgroundColor: '#2563eb',
-                    },
-                    borderRadius: '0px',
-                  }}
-                >
-                  Log In
-                </Button>
-          
-                {/* Proceed with Email Button */}
-                <Button
-                  onClick={() => setIsEmailMode(true)}
-                  color="primary"
-                  variant="outlined"
-                  sx={{
-                    flex: 1,
-                    textTransform: 'none',
-                    height: '48px',
-                    color: '#2563eb',
-                    borderColor: '#2563eb',
-                    '&:hover': {
-                      backgroundColor: '#eff6ff',
-                    },
-                    borderRadius: '0px',
-                  }}
-                >
-                  Proceed with Email
-                </Button>
-              </DialogActions>
-            </DialogContent>
-          </>
-          
-          
-          
-          ) : (
-            <>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 'bold',
-                textAlign: 'center',
-                mb: 1,
-              }}
-            >
-              Welcome to Poligonbuilds Network
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                textAlign: 'center',
-                color: '#6b7280',
-                mb: 3,
-              }}
-            >
-              To view your quote, please enter your email address or{' '}
-              <Typography
-                component="span"
-                sx={{
-                  color: '#2563eb',
-                  textDecoration: 'underline',
-                  cursor: 'pointer',
-                }}
-                onClick={() => {
-                  setOpenDialog(false);
-                  navigate('/login');
-                }}
-              >
-                sign in
-              </Typography>
-              .
-            </Typography>
-            <TextField
-              fullWidth
-              placeholder="Your work email *"
-              variant="outlined"
-              value={email}
-              onChange={handleEmailChange}
-              error={emailError}
-              helperText={emailError ? 'Please enter a valid email address' : ''}
-              InputProps={{
-                style: {
-                  borderRadius: '8px',
-                  height: '48px',
-                },
-              }}
-              sx={{
-                mb: 3,
-              }}
-            />
-            <Button
-              fullWidth
-              onClick={handleUpload}
-              color="primary"
-              variant="contained"
-              disabled={!email || emailError}
-              sx={{
-                textTransform: 'none',
-                height: '48px',
-                backgroundColor: '#c7d2fe',
-                color: '#374151',
-                fontWeight: 'bold',
-                '&:hover': {
-                  backgroundColor: '#a5b4fc',
-                },
-              }}
-            >
-              Go to your quote
-            </Button>
-          </>
-
-          )}
-        </DialogContent>
-      </Dialog>
+      <ExplanationDialog
+        open={openDialog}
+        setOpenDialog={setOpenDialog}
+        isEmailMode={isEmailMode}
+        setIsEmailMode={setIsEmailMode}
+        email={email}
+        setEmail={setEmail}
+        emailError={emailError}
+        handleEmailChange={handleEmailChange}
+        handleUpload={handleUpload}
+      />
 
       {/* Progress Dialog */}
-      <Dialog
-        open={isUploading}
-        aria-labelledby="upload-progress-dialog"
-        PaperProps={{
-          sx: {
-            padding: 2,
-            borderRadius: 3,
-            width: '400px',
-            textAlign: 'center',
-          },
-        }}
-      >
-        <DialogTitle id="upload-progress-dialog" sx={{ fontWeight: 'bold', fontSize: '1.25rem', color: '#4a4a4a' }}>
-          Uploading File
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ width: '100%', mt: 2 }}>
-            <LinearProgress
-              variant="determinate"
-              value={uploadProgress}
-              sx={{
-                height: 12,
-                borderRadius: 6,
-                backgroundColor: '#e0e0e0',
-                '& .MuiLinearProgress-bar': {
-                  background: 'linear-gradient(90deg, #6a11cb, #2575fc)',
-                },
-              }}
-            />
-            <Typography variant="body2" color="textSecondary" sx={{ mt: 1, fontWeight: 'bold', color: '#4a4a4a' }}>
-              {`${uploadProgress}% Completed`}
-            </Typography>
-          </Box>
-        </DialogContent>
-      </Dialog>
+      <ProgressDialog open={isUploading} uploadProgress={uploadProgress} />
     </>
   );
 };

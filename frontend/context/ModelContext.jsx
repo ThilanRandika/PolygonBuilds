@@ -8,14 +8,19 @@ export const ModelProvider = ({ children }) => {
     // Get the initial value from localStorage if it exists
     return localStorage.getItem("modelLink") || "";
   });
+  const [fileId, setFileId] = useState(() => {
+    // Get the initial value from localStorage if it exists
+    return localStorage.getItem("fileId") || "";
+  });
 
   useEffect(() => {
     // Update localStorage whenever modelLink changes
     localStorage.setItem("modelLink", modelLink);
-  }, [modelLink]);
+    localStorage.setItem("fileId", fileId);
+  }, [modelLink, fileId]);
 
   return (
-    <ModelContext.Provider value={{ modelLink, setModelLink }}>
+    <ModelContext.Provider value={{ modelLink, setModelLink, fileId, setFileId }}>
       {children}
     </ModelContext.Provider>
   );
