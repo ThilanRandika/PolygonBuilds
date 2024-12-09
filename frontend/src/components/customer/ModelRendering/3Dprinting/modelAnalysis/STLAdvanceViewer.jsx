@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import * as THREE from "three";
 import { STLLoader } from "three-stdlib";
 import { OrbitControls } from "three-stdlib";
@@ -14,11 +14,12 @@ import {
   PanTool,
   CameraAlt,
 } from "@mui/icons-material";
-import ConfigurationHeader2 from "../header/ConfigurationHeader2";
+import ConfigurationHeader2 from "../../../header/ConfigurationHeader2";
+import { ModelContext } from "../../../../../../context/ModelContext";
+
 
 
 const STLAdvanceViewer = () => {
-  const [uploadedFile, setUploadedFile] = useState(null);
   const [isXray, setIsXray] = useState(false);
   const [isHeatmap, setIsHeatmap] = useState(false); // Heatmap toggle
   const [mesh, setMesh] = useState(null);
@@ -38,18 +39,11 @@ const STLAdvanceViewer = () => {
   const [highlightEdges, setHighlightEdges] = useState(false);
   const [originalColors, setOriginalColors] = useState(null); // Store original geometry colors
   const [isTransparentMode, setIsTransparentMode] = useState(false); // Store original geometry colors
-
   const [renderer, setRenderer] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
   const rendererRef = useRef(null);
   const cameraRef = useRef(null);
-
-  useEffect(() => {
-    const fileURL = localStorage.getItem("uploadedFileURL");
-    if (fileURL) {
-      setUploadedFile(fileURL);
-    }
-  }, []);
+  const { modelLink } = useContext(ModelContext); // Access modelLink from context
 
   const addLighting = (scene) => {
     // Directional Light
@@ -70,10 +64,10 @@ const STLAdvanceViewer = () => {
   };
 
   useEffect(() => {
-    if (uploadedFile) {
+    if (modelLink) {
       loadSTL();
     }
-  }, [uploadedFile]);
+  }, [modelLink]);
 
   const loadSTL = () => {
     try {
@@ -113,7 +107,7 @@ const STLAdvanceViewer = () => {
   
       const loader = new STLLoader();
       loader.load(
-        uploadedFile,
+        modelLink,
         (geometry) => {
           geometry.computeBoundingBox();
           const boundingBox = geometry.boundingBox;
@@ -729,7 +723,6 @@ const STLAdvanceViewer = () => {
 
   return (
   <>
-  <ConfigurationHeader2/>
         <Box
   sx={{
     display: "flex",

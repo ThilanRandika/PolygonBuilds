@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Box,
   Typography,
@@ -18,6 +18,8 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../../firebase/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
+import { ModelContext } from '../../../../context/ModelContext';
+import axios from 'axios';
 
 const FileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -28,6 +30,8 @@ const FileUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
+  const { setModelLink } = useContext(ModelContext);
+  
 
   // Handle file selection
   const handleFileChange = (e) => {
@@ -48,12 +52,12 @@ const FileUpload = () => {
   // Handle file upload
   const handleUpload = () => {
     if (!selectedFile) return;
-
+  
     const storageRef = ref(storage, `files/${selectedFile.name}`);
     const uploadTask = uploadBytesResumable(storageRef, selectedFile);
-
+  
     setIsUploading(true);
-
+  
     uploadTask.on(
       'state_changed',
       (snapshot) => {
@@ -67,17 +71,35 @@ const FileUpload = () => {
         setIsUploading(false);
         setUploadProgress(0);
       },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
           console.log('File available at', downloadURL);
-          localStorage.setItem('uploadedFileURL', downloadURL);
+  
+          // Save the file to the backend using axios
+          const response = await axios.post('http://localhost:8070/api/file/saveFile', {
+            email, // Assuming email is set in your component
+            type: '3Dprinting', // Adjust based on file type
+            fileURL: downloadURL,
+          });
+  
+          if (response.status === 200) {
+            console.log('File saved successfully:', response.data);
+            // Optionally, use response.data.file.id or other data from the response
+            setModelLink(downloadURL); // Update context with the file link
+            navigate('/3dmodel/stl-Advance-viewer', { state: { data: response.data } });
+          } else {
+            console.error('Failed to save file:', response.data.error);
+          }
+        } catch (error) {
+          console.error('Error during saveFile request:', error.response?.data || error.message);
+        } finally {
           setIsUploading(false);
           setUploadProgress(0);
-          navigate('/createOrder');
-        });
+        }
       }
     );
-
+  
     setOpenDialog(false);
   };
 

@@ -1,7 +1,4 @@
-import React from "react";
-import { Box, Typography, Button, IconButton } from "@mui/material";
-import FilterAltIcon from "@mui/icons-material/FilterAlt"; // For the "Configure" icon
-import SearchIcon from "@mui/icons-material/Search"; // For the "Analyze" icon
+import { Box, Typography, Button } from "@mui/material";
 
 const ConfigurationHeader = () => {
   return (
