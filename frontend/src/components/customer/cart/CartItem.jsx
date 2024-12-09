@@ -34,7 +34,7 @@ const CartItem = ({
 
   const handleEditConfiguration = () => {
     setModelLink(item.model);
-    navigate(`/3dmodel/configurations`);
+    navigate(`/3dmodel/configurations`, { state: { itemId: item._id } });
   };
 
   const handleImageClick = () => {
