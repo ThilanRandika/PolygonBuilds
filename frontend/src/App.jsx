@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css'
 import CustomerUI from './components/customer/CustomerUI';
 import AdminUI from './components/admin/AdminUI';
-import STLViewer from './components/customer/ModelRendering/STLViewer';
+import STLViewer from './components/customer/ModelRendering/3Dprinting/modelAnalysis/STLViewer';
 
 function App() {
 

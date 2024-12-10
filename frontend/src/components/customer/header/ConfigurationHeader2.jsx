@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Button } from "@mui/material";
 import FilterAltIcon from "@mui/icons-material/FilterAlt"; // Configure icon
 import SearchIcon from "@mui/icons-material/Search"; // Analyze icon
@@ -34,11 +33,11 @@ const ConfigurationHeader2 = () => {
         {/* Configure Button */}
         <Button
           startIcon={<FilterAltIcon />}
-          variant={isActive("/createOrder") ? "contained" : "text"} // Highlight active tab
-          onClick={() => navigate("/createOrder")} // Navigate to Create Order page
+          variant={isActive("/3dmodel/configurations") ? "contained" : "text"} // Highlight active tab
+          onClick={() => navigate("/3dmodel/configurations")} // Navigate to Create Order page
           sx={{
-            backgroundColor: isActive("/createOrder") ? "#D0E9FF" : "transparent", // Light blue background if active
-            color: isActive("/createOrder") ? "#007BFF" : "#007BFF",
+            backgroundColor: isActive("/3dmodel/configurations") ? "#D0E9FF" : "transparent", // Light blue background if active
+            color: isActive("/3dmodel/configurations") ? "#007BFF" : "#007BFF",
             textTransform: "none",
             fontWeight: "bold",
             "&:hover": {
@@ -52,11 +51,11 @@ const ConfigurationHeader2 = () => {
         {/* Analyze Button */}
         <Button
           startIcon={<SearchIcon />}
-          variant={isActive("/stl-Advance-viewer") ? "contained" : "text"} // Highlight active tab
-          onClick={() => navigate("/stl-Advance-viewer")} // Navigate to Advanced Model Viewer page
+          variant={isActive("/3dmodel/stl-Advance-viewer") ? "contained" : "text"} // Highlight active tab
+          onClick={() => navigate("/3dmodel/stl-Advance-viewer")} // Navigate to Advanced Model Viewer page
           sx={{
-            backgroundColor: isActive("/stl-Advance-viewer") ? "#D0E9FF" : "transparent", // Light blue background if active
-            color: isActive("/stl-Advance-viewer") ? "#007BFF" : "#007BFF",
+            backgroundColor: isActive("/3dmodel/stl-Advance-viewer") ? "#D0E9FF" : "transparent", // Light blue background if active
+            color: isActive("/3dmodel/stl-Advance-viewer") ? "#007BFF" : "#007BFF",
             textTransform: "none",
             fontWeight: "bold",
             "&:hover": {

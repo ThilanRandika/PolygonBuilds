@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import * as THREE from "three";
 import { STLLoader } from "three-stdlib";
 import { OrbitControls } from "three-stdlib";
@@ -14,14 +14,16 @@ import {
   PanTool,
   CameraAlt,
 } from "@mui/icons-material";
-import ConfigurationHeader2 from "../header/ConfigurationHeader2";
+import ConfigurationHeader2 from "../../../header/ConfigurationHeader2";
+import { ModelContext } from "../../../../../../context/ModelContext";
+
 
 
 const STLAdvanceViewer = () => {
-  const [uploadedFile, setUploadedFile] = useState(null);
   const [isXray, setIsXray] = useState(false);
   const [isHeatmap, setIsHeatmap] = useState(false); // Heatmap toggle
   const [mesh, setMesh] = useState(null);
+  const [scene, setScene] = useState(null);
   const [camera, setCamera] = useState(null);
   const [controls, setControls] = useState(null);
   const [clippingPlane, setClippingPlane] = useState(null); // Clipping plane
@@ -38,18 +40,19 @@ const STLAdvanceViewer = () => {
   const [highlightEdges, setHighlightEdges] = useState(false);
   const [originalColors, setOriginalColors] = useState(null); // Store original geometry colors
   const [isTransparentMode, setIsTransparentMode] = useState(false); // Store original geometry colors
-
   const [renderer, setRenderer] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
+  const [isMeasurementActive, setIsMeasurementActive] = useState(false);
+  const [firstClickPoint, setFirstClickPoint] = useState(null);
+  const [dynamicLine, setDynamicLine] = useState(null);
+  const [fixedPosition, setFixedPosition] = useState(false);
+  const [fixedDistance, setFixedDistance] = useState(false);
+  const [mousePosition, setMousePosition] = useState(null);
+  const [isDynamicLineActive, setIsDynamicLineActive] = useState(false); 
+  const [wedges, setWedges] = useState([]); // Array for wedges
   const rendererRef = useRef(null);
   const cameraRef = useRef(null);
-
-  useEffect(() => {
-    const fileURL = localStorage.getItem("uploadedFileURL");
-    if (fileURL) {
-      setUploadedFile(fileURL);
-    }
-  }, []);
+  const { modelLink } = useContext(ModelContext); // Access modelLink from context
 
   const addLighting = (scene) => {
     // Directional Light
@@ -70,15 +73,15 @@ const STLAdvanceViewer = () => {
   };
 
   useEffect(() => {
-    if (uploadedFile) {
+    if (modelLink) {
       loadSTL();
     }
-  }, [uploadedFile]);
+  }, [modelLink]);
 
   const loadSTL = () => {
     try {
       const scene = new THREE.Scene();
-  
+      setScene(scene)
       // Create both cameras
       const perspectiveCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
       const orthographicCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
@@ -88,6 +91,7 @@ const STLAdvanceViewer = () => {
   
       const renderer = rendererRef.current || new THREE.WebGLRenderer({ antialias: true });
       setRenderer(renderer);
+      rendererRef.current = renderer;
       if (isTransparentMode) {
         renderer.setClearColor(0x222222, 1); // Dark background
       } else {
@@ -113,7 +117,7 @@ const STLAdvanceViewer = () => {
   
       const loader = new STLLoader();
       loader.load(
-        uploadedFile,
+        modelLink,
         (geometry) => {
           geometry.computeBoundingBox();
           const boundingBox = geometry.boundingBox;
@@ -577,48 +581,179 @@ const STLAdvanceViewer = () => {
     analyzeIntegrity();
   };
 
-  const onMouseClick = (event) => {
-    if (!camera || !mesh || !isMeasurementEnabled) {
-      return;
+  const createWedge = (position) => {
+    const geometry = new THREE.ConeGeometry(0.02, -0.1, 10);
+    const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+    const cone = new THREE.Mesh(geometry, material);
+    cone.position.copy(position);
+    cone.rotation.x = Math.PI / 2;
+    return cone;
+  };
+  
+  const toScreenPosition = (point, camera, renderer) => {
+    if (!renderer) return { x: 0, y: 0 };
+
+    const vector = point.clone().project(camera);
+    const rect = renderer.domElement.getBoundingClientRect();
+    return {
+      x: ((vector.x + 1) / 2) * rect.width + rect.left,
+      y: (-(vector.y - 1) / 2) * rect.height + rect.top,
+    };
+  };
+  
+  const calculateDistance = (currentMousePosition) => {
+    if (!isMeasurementActive) return null;
+    if (firstClickPoint && currentMousePosition) {
+      const distance = currentMousePosition.distanceTo(firstClickPoint);
+      return distance.toFixed(2);
     }
+    return null;
+  };
 
-    const mouse = new THREE.Vector2();
+
+  const handleMouseMove = (event) => {
+    if (!mesh || !scene || !rendererRef.current || !isMeasurementActive) return;
+
     const raycaster = new THREE.Raycaster();
-    const canvas = event.target;
+    const rect = rendererRef.current.domElement.getBoundingClientRect();
+    const mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    const mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-    mouse.x = (event.clientX / canvas.clientWidth) * 2 - 1;
-    mouse.y = -(event.clientY / canvas.clientHeight) * 2 + 1;
+    const mouseVector = new THREE.Vector2(mouseX, mouseY);
 
-    raycaster.setFromCamera(mouse, camera);
-    raycaster.far = 1000;
+    raycaster.setFromCamera(mouseVector, camera);
+    const intersects = raycaster.intersectObject(mesh);
 
-    const intersects = raycaster.intersectObject(mesh); 
     if (intersects.length > 0) {
-      const intersectionPoint = intersects[0].point; 
-      const marker = new THREE.Mesh(
-        new THREE.SphereGeometry(10),
-        new THREE.MeshBasicMaterial({ color: 0xff0000 })
-      );
+      const point = intersects[0].point;
+      setMousePosition(point);
 
-      marker.position.copy(intersectionPoint);
-      mesh.add(marker);
-
-      camera.position.set(
-        intersectionPoint.x + 10,
-        intersectionPoint.y + 10,
-        intersectionPoint.z + 10
-      );
-      camera.lookAt(intersectionPoint);
-
-      setPoints((prevPoints) => {
-        const newPoints = [...prevPoints, intersectionPoint];
-        if (newPoints.length === 2) {
-          calculateDistance(newPoints);
+      if (isDynamicLineActive && firstClickPoint) {
+        // Remove existing dynamic line
+        if (dynamicLine) {
+          scene.remove(dynamicLine);
         }
-        return newPoints; 
-      });
+
+        const dynamicLineGeometry = new THREE.BufferGeometry().setFromPoints([
+          firstClickPoint,
+          point,
+        ]);
+
+        const dynamicLineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+        const newDynamicLine = new THREE.Line(dynamicLineGeometry, dynamicLineMaterial);
+
+        scene.add(newDynamicLine);
+        setDynamicLine(newDynamicLine);
+      }
     }
   };
+
+
+  const handleMouseClick = (event) => {
+    if (!mesh || !scene || !isMeasurementActive) return;
+
+    const raycaster = new THREE.Raycaster();
+    const rect = rendererRef.current.domElement.getBoundingClientRect();
+    const mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    const mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(new THREE.Vector2(mouseX, mouseY), camera);
+    const intersects = raycaster.intersectObject(mesh);
+
+    if (intersects.length > 0) {
+      const clickPoint = intersects[0].point;
+
+       // Add a wedge to the clicked point
+       const wedge = createWedge(clickPoint);
+       scene.add(wedge);
+ 
+       // Keep track of wedges
+       setWedges((prevWedges) => [...prevWedges, wedge]);
+
+      if (!firstClickPoint) {
+        // Set the first click point and start dynamic measurement
+        setFirstClickPoint(clickPoint);
+        setIsDynamicLineActive(true);
+      } else if (isDynamicLineActive) {
+        // Second click, finalize the measurement
+        if (dynamicLine) scene.remove(dynamicLine);
+
+         // Fix tooltip position
+         const tooltipCoords = toScreenPosition(clickPoint, camera, rendererRef.current);
+         setFixedPosition(tooltipCoords);
+
+
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+          firstClickPoint,
+          clickPoint,
+        ]);
+
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00 });
+        const fixedLine = new THREE.Line(lineGeometry, lineMaterial);
+
+        scene.add(fixedLine);
+        setDynamicLine(null);
+        setIsDynamicLineActive(false);
+
+        const distance = firstClickPoint.distanceTo(clickPoint);
+        setFixedDistance(distance.toFixed(2));
+        console.log("Distance:", distance.toFixed(2), "mm");
+      } else {
+        // Reset process on 3rd click
+        setFirstClickPoint(clickPoint);
+        setIsDynamicLineActive(true);
+        setFixedDistance(null);
+        setFixedPosition(null);
+      }
+    }
+  };
+  
+
+
+  const MouseCoordinateTooltip = () => {
+    if (!mousePosition || !isMeasurementActive) return null;
+  
+    let distance = calculateDistance(mousePosition);
+    const coords = toScreenPosition(mousePosition, camera, rendererRef.current);
+    if (fixedPosition) {
+      distance = fixedDistance;
+    }
+  
+    return (
+      <div
+        style={{
+          position: "absolute",
+          left: `${coords.x - 50}px`,
+          top: `${coords.y - 150}px`,
+          backgroundColor: "#000000",
+          color: "white",
+          padding: "10px",
+          borderRadius: "10px",
+          fontSize: "15px",
+        }}
+      >
+        <div>
+          {/* Distance with Red */}
+          <span style={{ fontSize: "17px",fontWeight: "bold" }}>Distance: {distance ? `${distance} mm` : "N/A"}</span>
+        </div>
+        <div>
+          {/* X coordinate with Blue */}
+          <span style={{ color: "#fb8787", fontWeight: "bold" }}>X: {mousePosition.x.toFixed(2)} mm</span>
+        </div>
+        <div>
+          {/* Y coordinate with Green */}
+          <span style={{ color: "#88f99e", fontWeight: "bold" }}>Y: {mousePosition.y.toFixed(2)} mm</span>
+        </div>
+        <div>
+          {/* Z coordinate with Yellow */}
+          <span style={{ color: "#89b4f9", fontWeight: "bold" }}>Z: {mousePosition.z.toFixed(2)} mm</span>
+        </div>
+      </div>
+    );
+  };
+  
+  
+  
 
   //hoghlight model edges
   const highlightModelEdges = () => {
@@ -693,23 +828,12 @@ const STLAdvanceViewer = () => {
       }
     }
   };
-  
 
-  const toggleMeasurementMode = () => {
-    setIsMeasurementEnabled((prevState) => !prevState);
-    setPoints([]); // Clear previous points
-    setDistance(null); // Reset distance
-    if (line) {
-      mesh.remove(line); // Remove the line if exists
-      setLine(null);
-    }
-  };
-
-  const calculateDistance = (points) => {
-    if (points.length === 2) {
-      const dist = points[0].distanceTo(points[1]);
-      setDistance(dist.toFixed(2));
-    }
+  const toggleMeasurement = () => {
+    console.log('isMeasurementActive', isMeasurementActive)
+    console.log('scene', scene)
+    setIsMeasurementActive((prev) => !prev);
+    console.log('isMeasurementActive', isMeasurementActive)
   };
 
   
@@ -729,7 +853,6 @@ const STLAdvanceViewer = () => {
 
   return (
   <>
-  <ConfigurationHeader2/>
         <Box
   sx={{
     display: "flex",
@@ -767,7 +890,11 @@ const STLAdvanceViewer = () => {
           width: "100%",
           height: "100%",
         }}
-      />
+        onMouseMove={handleMouseMove}
+        onClick={handleMouseClick}
+      >
+        <MouseCoordinateTooltip />
+      </Box>
 
       {/* Bottom Bar */}
       <Box
@@ -861,7 +988,7 @@ const STLAdvanceViewer = () => {
     {[
       { label: "Bounding Box", icon: <CropSquare />, onClick: toggleBoundingBox },
       { label: "Model Edges", icon: <Navigation />, onClick: highlightModelEdges },
-      { label: "Measure", icon: <Straighten />, onClick: highlightModelEdges },
+      { label: "Measure", icon: <Straighten />, onClick: toggleMeasurement },
       { label: "Heat Map View", icon: <PanTool />, onClick: toggleHeatmap },
     ].map((item, index) => (
       <Tooltip title={item.label} key={index}>

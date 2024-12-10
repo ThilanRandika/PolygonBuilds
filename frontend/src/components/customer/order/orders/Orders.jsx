@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { CircularProgress, Typography } from '@mui/material';
 import OrderTabs from '../../../customer/order/orders/OrderTabs';
