@@ -1,62 +1,20 @@
-import React, { useState } from "react";
-import { TextField, Button, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Button, TextField, Typography } from '@mui/material';
+import React, { useState } from 'react'
 import axios from "axios";
-import PropTypes from 'prop-types';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import { Link } from '@mui/material';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { storage } from '../../../firebase/firebaseConfig';  // Ensure firebase is correctly configured
-import FDM from "./FDM";
-import SLA from "./SLA";
+import { storage } from '../../../firebase/firebaseConfig';
 
-
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
-  );
-}
-
-CustomTabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
-
-
-const AdminCustomizationForm = () => {
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
-
+function FDM() {
+  const [process, setProcess] = useState([]);
   const [materials, setMaterials] = useState([]);
-  const [finishes, setFinishes] = useState([]);
-  const [colors, setColors] = useState([]);
+  const [finish, setFinish] = useState([]);
+  const [layerHeight, setLayerHeight] = useState([]);
+  const [color, setColor] = useState([]);
 
+  const [newProcess, setNewProcess] = useState({ name: ""});
   const [newMaterial, setNewMaterial] = useState({ name: "", image: "" });
   const [newFinish, setNewFinish] = useState({ name: "", image: "" });
+  const [newLayerHeight, setNewLayerHeight] = useState({ name: ""});
   const [newColor, setNewColor] = useState({ name: "", colorCode: "" });
 
   const [imageFile, setImageFile] = useState(null);  // For storing the selected file
@@ -68,7 +26,7 @@ const AdminCustomizationForm = () => {
   // Function to check if a customization exists without updating the database
   const checkCustomizationExists = async (type, customization) => {
     try {
-      const response = await axios.post("http://localhost:8070/api/customization/check-existence", {
+      const response = await axios.post("http://localhost:8070/api/customization/fdm/check-existence", {
         type,
         customization,
       });
@@ -125,7 +83,7 @@ const AdminCustomizationForm = () => {
         }
 
         // Proceed to add the customization if it does not exist
-        const response = await axios.post("http://localhost:8070/api/customization/add-customization", {
+        const response = await axios.post("http://localhost:8070/api/customization/fdm/add-customization", {
           type,
           customization,
         });
@@ -146,7 +104,7 @@ const AdminCustomizationForm = () => {
           pendingUpdate.customization.image = imageUrl;  // Set the Firebase URL to the image field
         }
 
-        const response = await axios.post("http://localhost:8070/api/customization/add-customization", {
+        const response = await axios.post("http://localhost:8070/api/customization/fdm/add-customization", {
           type: pendingUpdate.type,
           customization: pendingUpdate.customization,
         });
@@ -166,6 +124,7 @@ const AdminCustomizationForm = () => {
     alert("No changes were made.");  // Notify the user
   };
 
+
   const handleAddMaterial = () => {
     handleAddCustomization("materials", newMaterial);
     setNewMaterial({ name: "", image: "" });
@@ -184,44 +143,94 @@ const AdminCustomizationForm = () => {
     setImageFile(null);  // Clear the selected image file
   };
 
+  const handleAddProcess = () => {
+    handleAddCustomization("processes", newProcess);
+    setNewProcess({ name: "" });
+    setImageFile(null);  // Clear the selected image file
+  };
+
+  const handleAddLayerHeight = () => {
+    handleAddCustomization("layerHeights", newLayerHeight);
+    setNewLayerHeight({ name: "" });
+    setImageFile(null);  // Clear the selected image file
+  };
+
+
+
+
+
+
   return (
     <div>
-      <Typography variant="h5" gutterBottom>Customize Selection Options</Typography>
+      FDM
+      {/* Form for Adding New Process */}
+      <Typography variant="h6" gutterBottom>Add New Process</Typography>
+      <TextField
+        label="Process Name"
+        fullWidth
+        value={newProcess.name}
+        onChange={(e) => setNewProcess({...newProcess, name: e.target.value })}
+        />
+        <Button onClick={handleAddProcess} disabled={uploading}>Add Process</Button>
 
-      
+      {/* Form for Adding New Material */}
+      <Typography variant="h6" gutterBottom>Add New Material</Typography>
+      <TextField
+        label="Material Name"
+        fullWidth
+        value={newMaterial.name}
+        onChange={(e) => setNewMaterial({ ...newMaterial, name: e.target.value })}
+      />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImageFile(e.target.files[0])}  // Select the file
+      />
+      <Button onClick={handleAddMaterial} disabled={uploading}>Add Material</Button>
 
-      <Box sx={{ width: '100%' }}>
-      {/* Tabs for navigation */}
-      <Box>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-          variant="fullWidth"
-          textColor="inherit"
-          centered
-          TabIndicatorProps={{
-            style: { backgroundColor: '#ff5733 ' },
-          }}
-          
-        >
-          <Tab label="FDM" {...a11yProps(0)} sx={{ bgcolor: 'white', borderRadius: '10px', mx: 1 }} />
-          <Tab label="SLA" {...a11yProps(1)} sx={{ bgcolor: 'white', borderRadius: '10px', mx: 1 }} />
-        </Tabs>
-      </Box>
+      {/* Form for Adding New Finish */}
+      <Typography variant="h6" gutterBottom>Add New Finish</Typography>
+      <TextField
+        label="Finish Name"
+        fullWidth
+        value={newFinish.name}
+        onChange={(e) => setNewFinish({ ...newFinish, name: e.target.value })}
+      />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setImageFile(e.target.files[0])}  // Select the file
+      />
+      <Button onClick={handleAddFinish} disabled={uploading}>Add Finish</Button>
 
-      {/* Tab Panels */}
-      <CustomTabPanel value={value} index={0}>
-        <FDM></FDM>
-      </CustomTabPanel>
-      <CustomTabPanel value={value} index={1}>
-        <SLA></SLA>
-      </CustomTabPanel>
-    </Box>
+      {/* Form for Adding New Color */}
+      <Typography variant="h6" gutterBottom>Add New Color</Typography>
+      <TextField
+        label="Color Name"
+        fullWidth
+        value={newColor.name}
+        onChange={(e) => setNewColor({ ...newColor, name: e.target.value })}
+      />
+      <TextField
+        label="Color Code"
+        fullWidth
+        value={newColor.colorCode}
+        onChange={(e) => setNewColor({ ...newColor, colorCode: e.target.value })}
+      />
+      <Button onClick={handleAddColor} disabled={uploading}>Add Color</Button>
 
+      {/* Form for Adding New Layer Height */}
+      <Typography variant="h6" gutterBottom>Add New Layer Height</Typography>
+      <TextField
+        label="Layer Height (mm)"
+        fullWidth
+        value={newLayerHeight.name}
+        onChange={(e) => setNewLayerHeight({...newLayerHeight, name: e.target.value })}
+      />
+      <Button onClick={handleAddLayerHeight} disabled={uploading}>Add Layer Height</Button>
 
     </div>
-  );
-};
+  )
+}
 
-export default AdminCustomizationForm;
+export default FDM
