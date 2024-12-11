@@ -63,9 +63,11 @@ router.get("/fdm/all-customizations", async (req, res) => {
       return res.status(404).json({ message: "No customizations found" });
     }
     res.status(200).json({
+      processes: customization.processes,
       materials: customization.materials,
       finishes: customization.finishes,
       colors: customization.colors,
+      layerHeights: customization.layerHeights,
     });
   } catch (error) {
     res.status(500).json({ message: "Error fetching customizations", error });
@@ -132,7 +134,7 @@ router.post("/sla/add-customization", async (req, res) => {
 });
 
 
-// API to get all customizations (materials, finishes, and colors)
+// API to get all customizations (processes, materials, finishes, infills, colors, and layerHeights)
 router.get("/sla/all-customizations", async (req, res) => {
   try {
     const customization = await SlaCustomization.findOne({});
@@ -140,14 +142,18 @@ router.get("/sla/all-customizations", async (req, res) => {
       return res.status(404).json({ message: "No customizations found" });
     }
     res.status(200).json({
+      processes: customization.processes,
       materials: customization.materials,
       finishes: customization.finishes,
+      infills: customization.infills,
       colors: customization.colors,
+      layerHeights: customization.layerHeights,
     });
   } catch (error) {
     res.status(500).json({ message: "Error fetching customizations", error });
   }
 });
+
 
 
 

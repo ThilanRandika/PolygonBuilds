@@ -13,6 +13,9 @@ import {
   Typography,
   TextareaAutosize,
   Box,
+  FormHelperText,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material";
 import { Navigate } from "react-router-dom";
 
@@ -21,10 +24,21 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
 
   const [formData, setFormData] = useState({
     quantity: "",
+    fileUnits: "",
+    process: "",
     material: "",
     finish: "",
+    infill: "",
+    layerHeight: "",
     color: "",
+    technicalDrawing: "",
+    printOrientation: "",
+    tolerance: "",
+    cosmeticSide: "",
+    industryDescription: "",
+    hardnessDescription: "",
     specialInstructions: "",
+
     verticalResolutionVisible: false,
     verticalResolution: "",
     verticalResolutionLetTeamDecide: false,
@@ -33,41 +47,76 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
     infilTypeLetTeamDecide: false,
   });
 
+  const [process, setProcess] = useState("SLA");
+
   const [materials, setMaterials] = useState([]);
   const [finishes, setFinishes] = useState([]);
   const [colors, setColors] = useState([]);
+  const [infills, setInfills] = useState([]);
+  const [layerHeights, setLayerHeights] = useState([]);
+
   const [isLoading, setIsLoading] = useState(true);
 
+
   useEffect(() => {
-    const fetchCustomizations = async () => {
-      try {
-        const response = await axios.get('http://localhost:8070/api/customization/all-customizations');
-        setMaterials(response.data.materials || []);
-        setFinishes(response.data.finishes || []);
-        setColors(response.data.colors || []);
-      } catch (error) {
-        console.error('Error fetching customizations:', error);
-      } finally {
-        setIsLoading(false); // Set loading to false after data is fetched
-      }
-    };
+    
   
-    fetchCustomizations();
+    fetchSlaCustomizations();
   }, []);
+
+  const fetchFdmCustomizations = async () => {
+    try {
+      const response = await axios.get('http://localhost:8070/api/customization/fdm/all-customizations');
+      setMaterials(response.data.materials || []);
+      setFinishes(response.data.finishes || []);
+      setColors(response.data.colors || []);
+      setLayerHeights(response.data.layerHeights || []);
+    } catch (error) {
+      console.error('Error fetching customizations:', error);
+    } finally {
+      setIsLoading(false); // Set loading to false after data is fetched
+    }
+  };
+
+  const fetchSlaCustomizations = async () => {
+    try {
+      const response = await axios.get('http://localhost:8070/api/customization/sla/all-customizations');
+      setMaterials(response.data.materials || []);
+      setFinishes(response.data.finishes || []);
+      setColors(response.data.colors || []);
+      setLayerHeights(response.data.layerHeights || []);
+      setInfills(response.data.infills || []);
+    } catch (error) {
+      console.error('Error fetching customizations:', error);
+    } finally {
+      setIsLoading(false); // Set loading to false after data is fetched
+    }
+  };
 
   useEffect(() => {
     if (isEditMode && itemDetails && Object.keys(itemDetails).length > 0) {
       setFormData({
+        process: itemDetails.process || "",
         quantity: itemDetails.quantity || "",
         material: itemDetails.material || "",
         finish: itemDetails.finish || "",
         color: itemDetails.color || "",
+        infill: itemDetails.infill || "",
+        layerHeight: itemDetails.layerHeight || "",
+        fileUnits: itemDetails.fileUnits || "",
+        technicalDrawing: itemDetails.technicalDrawing || "",
+        printOrientation: itemDetails.printOrientation || "",
+        tolerance: itemDetails.tolerance || "",
+        cosmeticSide: itemDetails.cosmeticSide || "",
+        industryDescription: itemDetails.industryDescription || "",
+        hardnessDescription: itemDetails.hardnessDescription || "",
         specialInstructions: itemDetails.specialInstructions || "",
         verticalResolution: itemDetails.verticalResolution || "",
         verticalResolutionLetTeamDecide: itemDetails.verticalResolutionLetTeamDecide || false,
         infilType: itemDetails.infilType || "",
         infilTypeLetTeamDecide: itemDetails.infilTypeLetTeamDecide || false,
       });
+      setProcess(itemDetails.process);
     }
   }, [isEditMode, itemDetails]);
 
@@ -107,14 +156,27 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log("ordr", formData.fileUnits);
   
     // Create the order data with the actual STL model link
     const orderData = {
       user_id: "user_id_placeholder", // Replace with actual user ID
       model: modelLink,  // Use the passed modelLink from STLViewer
       quantity: formData.quantity,
+      fileUnits: formData.fileUnits,
+      process: formData.process,
       material: formData.material,
       color: formData.color,
+      finish: formData.finish,
+      infill: formData.infill,
+      layerHeight: formData.layerHeight,
+      technicalDrawing: formData.technicalDrawing,
+      printOrientation: formData.printOrientation,
+      tolerance: formData.tolerance,
+      cosmeticSide: formData.cosmeticSide,
+      industryDescription: formData.industryDescription,
+      hardnessDescription: formData.hardnessDescription,
       quality: formData.finish,
       specialInstructions: formData.specialInstructions,
       verticalResolution: formData.verticalResolutionLetTeamDecide
@@ -124,6 +186,7 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
         ? "Let our team decide"
         : formData.infilType,
     };
+
   
     try {
       let response;
@@ -145,6 +208,18 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
   };
   
 
+  const handleProcess = (event, newProcess) => {
+    if(newProcess !== null){
+      setProcess(newProcess);
+    }
+  };
+
+  useEffect(() => {
+    formData.process = process;
+  }, [process]);
+
+  
+
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -155,6 +230,20 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
         <Typography variant="h5" gutterBottom>
           Part Properties
         </Typography>
+
+        <ToggleButtonGroup
+          value={process}
+          exclusive
+          onChange={handleProcess}
+          aria-label="process"
+        >
+          <ToggleButton value="SLA" aria-label="SLA">
+            SLA
+          </ToggleButton>
+          <ToggleButton value="FDM" aria-label="FDM">
+            FDM
+          </ToggleButton>
+        </ToggleButtonGroup>
 
         {/* Quantity */}
         <TextField
@@ -167,6 +256,20 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
           fullWidth
           margin="normal"
         />
+
+        {/* File Units */}
+        <FormControl variant="outlined" fullWidth margin="normal">
+          <InputLabel>File Units</InputLabel>
+          <Select
+            name="fileUnits"
+            value={formData.fileUnits || ""}
+            onChange={handleInputChange}
+          >
+            <MenuItem value="mm">mm</MenuItem>
+            <MenuItem value="in">in</MenuItem>
+          </Select>
+          <FormHelperText>Unit of measurement for the STL model</FormHelperText>
+        </FormControl>
 
         {/* Material */}
         <FormControl variant="outlined" fullWidth margin="normal">
@@ -228,6 +331,47 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
           </Select>
         </FormControl>
 
+        {/* Infill */}
+        <FormControl variant="outlined" fullWidth margin="normal">
+          <InputLabel>Infill</InputLabel>
+          <Select
+            name="infill"
+            value={formData.infill}
+            onChange={handleInputChange}
+          >
+            {infills.length > 0 ? (
+              infills.map((infill, index) => (
+                <MenuItem key={index} value={infill.name}>
+                  {infill.name}
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem disabled>No infills available</MenuItem>
+            )}
+          </Select>
+        </FormControl>
+
+
+        {/* Layer Height */}
+        <FormControl variant="outlined" fullWidth margin="normal">
+          <InputLabel>Layer Height</InputLabel> 
+          <Select
+          name="layerHeight"
+          value={formData.layerHeight}
+          onChange={handleInputChange}
+          >
+            {layerHeights.length > 0 ? (
+              layerHeights.map((layerHeight, index) => (
+                <MenuItem key={index} value={layerHeight.name}>
+                  {layerHeight.name}
+                </MenuItem>
+              ))
+              ) : (
+                <MenuItem disabled>No layer heights available</MenuItem>
+              )}
+          </Select>
+        </FormControl>
+          
         
         {/* Vertical Resolution */}
         <FormControl component="fieldset" fullWidth>

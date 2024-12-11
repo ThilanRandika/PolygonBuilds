@@ -40,6 +40,36 @@ const cartSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    process: {
+        type: String,
+    },
+    fileUnits: {
+        type: String,
+    },
+    infill: {
+        type: String,
+    },
+    layerHeight: {
+        type: String,
+    },
+    technicalDrawing: {
+        type: String,
+    },
+    printOrientation: {
+        type: String,
+    },
+    tolerance: {
+        type: String,
+    },
+    cosmeticSide: {
+        type: String,
+    },
+    industryDescription: {
+        type: String,
+    },
+    hardnessDescription: {
+        type: String,
+    },
     date: {
         type: Date,
         default: Date.now  // Automatically sets the order date to current date
