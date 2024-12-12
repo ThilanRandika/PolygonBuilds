@@ -1,4 +1,4 @@
-import * as React from 'react';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
@@ -13,6 +13,10 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../context/AuthContext';
+import { useContext, useState } from 'react';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -33,11 +37,15 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 export default function SignInCard() {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [open, setOpen] = React.useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const { dispatch, loading, error } = useContext(AuthContext);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+  const [open, setOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+
+  const navigate = useNavigate()
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -47,16 +55,31 @@ export default function SignInCard() {
     setOpen(false);
   };
 
-  const handleSubmit = (event) => {
-    if (emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
+    const formData = {
       email: data.get('email'),
       password: data.get('password'),
-    });
+    };
+
+    const errors = validateInputs(formData);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    dispatch({ type: 'LOGIN_START' });
+
+    try {
+      const response = await axios.post('http://localhost:8070/api/customer/login', formData, { withCredentials: true });
+      dispatch({ type: 'LOGIN_SUCCESS', payload: response.data.user });
+      alert(response.data.message);
+      navigate('/');
+    } catch (err) {
+      dispatch({ type: 'LOGIN_FAILURE', payload: err.response?.data?.error || 'An error occurred during login.' });
+      alert(err.response?.data?.error || 'An error occurred during login.');
+    }
   };
 
   const validateInputs = () => {
@@ -154,8 +177,8 @@ export default function SignInCard() {
           label="Remember me"
         />
         <ForgotPassword open={open} handleClose={handleClose} />
-        <Button type="submit" fullWidth variant="contained" onClick={validateInputs}>
-          Sign in
+        <Button type="submit" fullWidth variant="contained" disabled={loading} onClick={validateInputs}>
+          {loading ? 'Signing in...' : 'Sign in'}
         </Button>
         <Typography sx={{ textAlign: 'center' }}>
           Don&apos;t have an account?{' '}

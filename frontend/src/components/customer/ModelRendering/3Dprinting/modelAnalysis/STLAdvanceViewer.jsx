@@ -15,7 +15,7 @@ import {
   CameraAlt,
 } from "@mui/icons-material";
 import ConfigurationHeader2 from "../../../header/ConfigurationHeader2";
-import { ModelContext } from "../../../../../../context/ModelContext";
+import { ModelContext } from "../../../../../context/ModelContext";
 
 
 

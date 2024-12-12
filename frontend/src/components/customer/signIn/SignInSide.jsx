@@ -1,10 +1,9 @@
-import * as React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
 import SignInCard from './SignInCard';
 import Content from './Content';
 
-export default function SignInSide(props) {
+export default function SignInSide() {
   return (
     <>
       <CssBaseline enableColorScheme />

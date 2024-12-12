@@ -8,7 +8,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../../firebase/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
-import { ModelContext } from '../../../../context/ModelContext';
+import { ModelContext } from '../../../context/ModelContext';
 import axios from 'axios';
 import ProgressDialog from './popups/ProgressDialog';
 import ExplanationDialog from './popups/ExplanationDialog';

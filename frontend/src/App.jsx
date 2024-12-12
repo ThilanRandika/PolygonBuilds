@@ -9,7 +9,7 @@ import CustomerUI from './components/customer/CustomerUI';
 import AdminUI from './components/admin/AdminUI';
 import STLViewer from './components/customer/ModelRendering/3Dprinting/modelAnalysis/STLViewer';
 import SignInSide from './components/customer/signIn/SignInSide';
-import SignUp from './components/customer/signOut/SignUp';
+import SignUp from './components/customer/signUp/SignUp';
 
 function App() {
 
