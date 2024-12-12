@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import ConfigurationHeader from "../../../header/ConfigurationHeader";
 import { ModelContext } from "../../../../../../context/ModelContext";
+import ConfigurationsForm from "./ConfigurationsForm";
 
 function ModelConfiguration() {
   const location = useLocation();
@@ -104,6 +105,13 @@ function ModelConfiguration() {
             cartId={cartId}
           />
         </Box>
+
+
+
+        {/* optional column*/}
+        <ConfigurationsForm />
+
+
 
         {/* Right Column - SelectionOptions (Fixed) */}
         <Box 

@@ -1,0 +1,283 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  Container,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid,
+  Button,
+  TextField,
+} from "@mui/material";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+
+const ConfigurationsForm = () => {
+  const [process, setProcess] = useState("");
+  const [customizations, setCustomizations] = useState({});
+  const [selectedOptions, setSelectedOptions] = useState({});
+  const [additionalFields, setAdditionalFields] = useState({
+    fileUnits: "",
+    technicalDrawing: null,
+    printOrientation: "",
+    cosmeticSide: "",
+    industryDescription: "",
+    hardnessDescription: "",
+    specialInstructions: "",
+  });
+
+  // Handle process selection
+  const handleProcessChange = (event, newProcess) => {
+    if (newProcess) {
+      setProcess(newProcess);
+      fetchCustomizations(newProcess);
+      setSelectedOptions({}); // Reset selections when process changes
+    }
+  };
+
+  // Fetch customizations based on the selected process
+  const fetchCustomizations = async (process) => {
+    try {
+      const endpoint =
+        process === "FDM"
+          ? "http://localhost:8070/api/customization/fdm/all-customizations"
+          : "http://localhost:8070/api/customization/sla/all-customizations";
+      const response = await axios.get(endpoint);
+      setCustomizations(response.data);
+    } catch (error) {
+      console.error("Error fetching customizations:", error);
+    }
+  };
+
+  // Handle selection of options
+  const handleOptionChange = (category, value) => {
+    setSelectedOptions((prev) => ({
+      ...prev,
+      [category]: value,
+    }));
+  };
+
+  // Handle additional fields input
+  const handleAdditionalFieldChange = (field, value) => {
+    setAdditionalFields((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // Handle file upload
+  const handleFileUpload = (event) => {
+    setAdditionalFields((prev) => ({
+      ...prev,
+      technicalDrawing: event.target.files[0],
+    }));
+  };
+
+  // Submit form
+  const handleSubmit = () => {
+    // Combine all fields into one flat object
+    const submissionData = {
+      process,
+      ...selectedOptions,
+      ...additionalFields,
+    };
+  
+    console.log("Submission Data:", submissionData);
+  };
+  
+  
+
+  return (
+    <Container>
+      <Typography variant="h4" gutterBottom>
+        Customize Your 3D Print
+      </Typography>
+
+      {/* Process Selection with Toggle Buttons */}
+      <ToggleButtonGroup
+        value={process}
+        exclusive
+        onChange={handleProcessChange}
+        fullWidth
+        style={{ marginBottom: "20px" }}
+      >
+        <ToggleButton value="FDM">FDM</ToggleButton>
+        <ToggleButton value="SLA">SLA</ToggleButton>
+      </ToggleButtonGroup>
+
+      {process && (
+        <Grid container spacing={2}>
+          {/* File Units */}
+          <Grid item xs={12} md={12}>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>File Units</InputLabel>
+              <Select
+                value={additionalFields.fileUnits}
+                onChange={(e) => handleAdditionalFieldChange("fileUnits", e.target.value)}
+              >
+                <MenuItem value="mm">mm</MenuItem>
+                <MenuItem value="in">in</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+
+          {/* Existing Customizations */}
+          {customizations.materials && (
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Select Material</InputLabel>
+                <Select
+                  value={selectedOptions.material || ""}
+                  onChange={(e) => handleOptionChange("material", e.target.value)}
+                >
+                  {customizations.materials.map((material, index) => (
+                    <MenuItem key={index} value={material.name}>
+                      {material.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+
+          {/* Finishes */}
+          {customizations.finishes && (
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Select Finish</InputLabel>
+                <Select
+                  value={selectedOptions.finish || ""}
+                  onChange={(e) =>
+                    handleOptionChange("finish", e.target.value)
+                  }
+                >
+                  {customizations.finishes.map((finish, index) => (
+                    <MenuItem key={index} value={finish.name}>
+                      {finish.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+
+          {/* Infills (only for FDM) */}
+          {process === "FDM" && customizations.infills && (
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Select Infill</InputLabel>
+                <Select
+                  value={selectedOptions.infill || ""}
+                  onChange={(e) =>
+                    handleOptionChange("infill", e.target.value)
+                  }
+                >
+                  {customizations.infills.map((infill, index) => (
+                    <MenuItem key={index} value={infill.name}>
+                      {infill.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+
+          {/* Colors */}
+          {customizations.colors && (
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Select Color</InputLabel>
+                <Select
+                  value={selectedOptions.color || ""}
+                  onChange={(e) =>
+                    handleOptionChange("color", e.target.value)
+                  }
+                >
+                  {customizations.colors.map((color, index) => (
+                    <MenuItem key={index} value={color.name}>
+                      {color.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+
+          {/* Layer Heights */}
+          {customizations.layerHeights && (
+            <Grid item xs={12} md={12}>
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Select Layer Height</InputLabel>
+                <Select
+                  value={selectedOptions.layerHeight || ""}
+                  onChange={(e) =>
+                    handleOptionChange("layerHeight", e.target.value)
+                  }
+                >
+                  {customizations.layerHeights.map((layerHeight, index) => (
+                    <MenuItem key={index} value={layerHeight.name}>
+                      {layerHeight.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+
+
+          {/* Technical Drawing Upload */}
+          <Grid item xs={12} md={12}>
+            <FormControl fullWidth margin="normal">
+              <Typography>Upload Technical Drawing (Optional)</Typography>
+              <input
+                type="file"
+                accept=".pdf,.jpg,.png,.jpeg"
+                onChange={handleFileUpload}
+                style={{ marginTop: "8px" }}
+              />
+            </FormControl>
+          </Grid>
+
+          {/* Additional Text Fields */}
+          {[
+            { name: "printOrientation", label: "Print Orientation" },
+            { name: "cosmeticSide", label: "Cosmetic Side" },
+            { name: "industryDescription", label: "Industry Description" },
+            { name: "hardnessDescription", label: "Hardness Description" },
+            { name: "specialInstructions", label: "Special Instructions" },
+          ].map((field) => (
+            <Grid item xs={12} key={field.name}>
+              <TextField
+                fullWidth
+                label={field.label}
+                value={additionalFields[field.name]}
+                onChange={(e) => handleAdditionalFieldChange(field.name, e.target.value)}
+                margin="normal"
+                variant="outlined"
+              />
+            </Grid>
+          ))}
+
+        </Grid>
+      )}
+
+      {/* Submit Button */}
+      {process && (
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={handleSubmit}
+          style={{ marginTop: "20px" }}
+        >
+          Submit Customization
+        </Button>
+      )}
+    </Container>
+  );
+};
+
+export default ConfigurationsForm;
