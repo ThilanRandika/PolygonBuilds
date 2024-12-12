@@ -19,6 +19,11 @@ const fdmCustomizationSchema = new mongoose.Schema({
       image: { type: String},
     },
   ],
+  infills: [
+    {
+      name: { type: String, required: true },
+    },
+  ],
   colors: [
     {
       name: { type: String, required: true },

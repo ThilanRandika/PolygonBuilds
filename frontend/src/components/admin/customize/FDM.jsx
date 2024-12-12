@@ -10,12 +10,14 @@ function FDM() {
   const [finish, setFinish] = useState([]);
   const [layerHeight, setLayerHeight] = useState([]);
   const [color, setColor] = useState([]);
+  const [infill, setInfill] = useState([]);
 
   const [newProcess, setNewProcess] = useState({ name: ""});
   const [newMaterial, setNewMaterial] = useState({ name: "", image: "" });
   const [newFinish, setNewFinish] = useState({ name: "", image: "" });
   const [newLayerHeight, setNewLayerHeight] = useState({ name: ""});
   const [newColor, setNewColor] = useState({ name: "", colorCode: "" });
+  const [newInfill, setNewInfill] = useState({ name: ""});
 
   const [imageFile, setImageFile] = useState(null);  // For storing the selected file
   const [uploading, setUploading] = useState(false); // For upload state
@@ -155,6 +157,12 @@ function FDM() {
     setImageFile(null);  // Clear the selected image file
   };
 
+  const handleAddInfill = () => {
+    handleAddCustomization("infills", newInfill);
+    setNewInfill({ name: "" });
+    setImageFile(null);  // Clear the selected image file
+  };
+
 
 
 
@@ -228,6 +236,16 @@ function FDM() {
         onChange={(e) => setNewLayerHeight({...newLayerHeight, name: e.target.value })}
       />
       <Button onClick={handleAddLayerHeight} disabled={uploading}>Add Layer Height</Button>
+
+      {/* Form for Adding New Infill */}
+      <Typography variant="h6" gutterBottom>Add New Infill</Typography>
+      <TextField
+        label="Infill (%)"
+        fullWidth
+        value={newInfill.name}
+        onChange={(e) => setNewInfill({...newInfill, name: e.target.value })}
+      />
+      <Button onClick={handleAddInfill} disabled={uploading}>Add Infill</Button>
 
     </div>
   )

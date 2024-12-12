@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import ConfigurationHeader from "../../../header/ConfigurationHeader";
 import { ModelContext } from "../../../../../../context/ModelContext";
+import ConfigurationsForm from "./ConfigurationsForm";
 
 function ModelConfiguration() {
   const location = useLocation();
@@ -57,6 +58,8 @@ function ModelConfiguration() {
     }));
   };
 
+  console.log("Is edit mode" ,isEditMode);
+  console.log("cart id" ,cartId);
 
   return (
     <>
@@ -64,7 +67,7 @@ function ModelConfiguration() {
       <Box 
         sx={{
           display: 'grid',
-          gridTemplateColumns: '1fr 2fr 1fr', // Middle column is twice as large
+          gridTemplateColumns: '1fr 3fr',
           gap: '16px', // Space between columns
           padding: '16px', 
           height: '100vh' // Takes the full height of the viewport
@@ -85,8 +88,27 @@ function ModelConfiguration() {
           <STLViewer /> {/* Pass setModelLink to STLViewer */}
         </Box>
 
+        {/* Right Column - ConfigurationsForm and preview */}
+        <Box
+          sx={{
+            backgroundColor: 'ffffff',
+            padding: '26px',
+          }}
+        >
+            <ConfigurationsForm 
+              itemDetails = {itemDetails}
+              modelLink={modelLink}
+              cartId={cartId}
+              isEditMode={isEditMode}
+            />
+          </Box>
+      </Box>
+
+
+
+
         {/* Middle Column - ModelPropertiesForm (Scrollable) */}
-        <Box 
+        {/* <Box 
           sx={{
             backgroundColor: '#ffffff', 
             padding: '16px', 
@@ -103,10 +125,12 @@ function ModelConfiguration() {
             isEditMode={isEditMode} // Pass the isEditMode state to ModelPropertiesForm
             cartId={cartId}
           />
-        </Box>
+        </Box> */}
+
+
 
         {/* Right Column - SelectionOptions (Fixed) */}
-        <Box 
+        {/* <Box 
           sx={{
             backgroundColor: '#f0f0f0', 
             padding: '16px', 
@@ -121,8 +145,9 @@ function ModelConfiguration() {
             selectedOptions={selectedOptions}
             handleOptionSelect={handleOptionSelect}
           />
-        </Box>
-      </Box>
+        </Box> */}
+
+
     </>
   );
 }

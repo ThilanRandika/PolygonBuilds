@@ -4,7 +4,7 @@ const Cart = require('../../models/customer/Cart');
 
 // Create a new order
 router.post('/add', async (req, res) => {
-    const { user_id, model, quantity, material, color, quality, specialInstructions, infilType, verticalResolution } = req.body;
+    const { user_id, model, quantity, material, color, quality, specialInstructions, infilType, verticalResolution,  process, finish, fileUnits, infill, layerHeight, technicalDrawing, printOrientation, tolerance, cosmeticSide, industryDescription, hardnessDescription } = req.body;
 
     try {
         const newOrder = new Cart({
@@ -17,7 +17,18 @@ router.post('/add', async (req, res) => {
             specialInstructions,
             infilType,
             verticalResolution,
-            status: 1
+            status: 1,
+            process,
+            finish,
+            fileUnits,
+            infill,
+            layerHeight,
+            technicalDrawing,
+            printOrientation,
+            tolerance,
+            cosmeticSide,
+            industryDescription,
+            hardnessDescription,
         });
 
         const savedOrder = await newOrder.save();
@@ -71,6 +82,17 @@ router.put('/update/:id', async (req, res) => {
         specialInstructions,
         infilType,
         verticalResolution,
+        process,
+        finish,
+        fileUnits,
+        infill,
+        layerHeight,
+        technicalDrawing,
+        printOrientation,
+        tolerance,
+        cosmeticSide,
+        industryDescription,
+        hardnessDescription,
     } = req.body;
 
     try {
@@ -86,6 +108,17 @@ router.put('/update/:id', async (req, res) => {
                     specialInstructions,
                     infilType,
                     verticalResolution,
+                    process,
+                    finish,
+                    fileUnits,
+                    infill,
+                    layerHeight,
+                    technicalDrawing,
+                    printOrientation,
+                    tolerance,
+                    cosmeticSide,
+                    industryDescription,
+                    hardnessDescription,
                 },
             },
             { new: true } // Return the updated document
