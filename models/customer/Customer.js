@@ -28,11 +28,6 @@ const customerSchema = new mongoose.Schema({
         required: true,
         maxlength: 200
     },
-    role: {
-        type: Number,  // 1: Admin, 0: Customer (Assuming role types)
-        required: true,
-        default: 0    // Default role is customer
-    },
     active: {
         type: Boolean, // TinyInt is mapped to Boolean in MongoDB
         default: true  // Active by default

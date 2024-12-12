@@ -15,7 +15,7 @@ import {
   CameraAlt,
 } from "@mui/icons-material";
 import ConfigurationHeader2 from "../../../header/ConfigurationHeader2";
-import { ModelContext } from "../../../../../../context/ModelContext";
+import { ModelContext } from "../../../../../context/ModelContext";
 
 
 
@@ -55,22 +55,32 @@ const STLAdvanceViewer = () => {
   const { modelLink } = useContext(ModelContext); // Access modelLink from context
 
   const addLighting = (scene) => {
-    // Directional Light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
-    directionalLight.position.set(10, 10, 10);
-    directionalLight.castShadow = true; // Enable shadows
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    scene.add(directionalLight);
-
-    // Ambient Light
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+    // Ambient light for overall brightness (does not cast shadows)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); 
     scene.add(ambientLight);
-
-    // Hemisphere Light
-    const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x080820, 0.7);
-    scene.add(hemisphereLight);
+  
+    // Directional light for shadows and highlights
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 5, 5);
+    //directionalLight.castShadow = true; // Enable shadow casting
+    directionalLight.shadow.mapSize.width = 1024; // Shadow resolution
+    directionalLight.shadow.mapSize.height = 1024;
+    directionalLight.shadow.camera.near = 0.1; // Adjust shadow camera near clipping
+    directionalLight.shadow.camera.far = 50; // Adjust shadow camera far clipping
+    directionalLight.shadow.camera.left = -10; // Adjust shadow frustum
+    directionalLight.shadow.camera.right = 10;
+    directionalLight.shadow.camera.top = 10;
+    directionalLight.shadow.camera.bottom = -10;
+    scene.add(directionalLight);
+  
+    // Secondary directional light (for balance, without casting shadows)
+    const secondaryLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    secondaryLight.position.set(-5, -5, 5);
+    secondaryLight.castShadow = false; // No shadows from this light
+    scene.add(secondaryLight);
   };
+  
+  
 
   useEffect(() => {
     if (modelLink) {
@@ -95,7 +105,7 @@ const STLAdvanceViewer = () => {
       if (isTransparentMode) {
         renderer.setClearColor(0x222222, 1); // Dark background
       } else {
-        renderer.setClearColor(0xeaeaea, 1); // Normal background
+        renderer.setClearColor(0xffffff, 1); // Normal background
       }
   
       const viewerElement = document.getElementById("viewer");
@@ -128,14 +138,15 @@ const STLAdvanceViewer = () => {
           // Initial Material Configuration
           const material = new THREE.MeshStandardMaterial({
             wireframe: isXray, // Initial state depends on isXray
-            metalness: 0.3, // Slight metallic look
+            metalness: 0.1, // Low metallic look for smooth surface
+            roughness: 0.45,
             clippingPlanes: [],
             clipIntersection: true,
             opacity: isTransparentMode ? 0.5 : 1, // Adjust opacity based on mode
-            color: isTransparentMode ? 0x888888 : 0xffffff, // Grayscale for transparent mode, white otherwise
+            color: isTransparentMode ? 0x888888 : 0xd4d4d4, // Grayscale for transparent mode, white otherwise
             emissive: isTransparentMode ? new THREE.Color(0x888888) : new THREE.Color(0x444444), // Subtle glow for transparent mode
             emissiveIntensity: isTransparentMode ? 0.05 : 0.3, // Glow intensity
-            side: isTransparentMode ? THREE.DoubleSide : THREE.FrontSide, // Double-sided for transparency, front-side otherwise
+            side: isTransparentMode ? THREE.DoubleSide : THREE.DoubleSide, // Double-sided for transparency, front-side otherwise
           });
           
 

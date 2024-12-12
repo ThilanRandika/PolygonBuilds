@@ -8,7 +8,7 @@ import {
   FaRegEye,
   FaRegEyeSlash,
 } from "react-icons/fa";
-import { ModelContext } from "../../../../../../context/ModelContext";
+import { ModelContext } from "../../../../../context/ModelContext";
 
 const STLViewer = () => {
   const [isXray, setIsXray] = useState(false);

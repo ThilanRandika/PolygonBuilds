@@ -4,8 +4,6 @@ import Cart from './cart/Cart'
 import { Route, Routes } from 'react-router-dom'
 import Orders from './order/orders/Orders'
 import FileUpload from './fileUpload/FileUpload'
-import ModelConfiguration from './ModelRendering/3Dprinting/ModelConfigurations/ModelConfiguration'
-import STLAdvanceViewer from './ModelRendering/3Dprinting/modelAnalysis/STLAdvanceViewer'
 import ThreeDModel from './ModelRendering/3Dprinting/ThreeDModel'
 
 function CustomerUI() {

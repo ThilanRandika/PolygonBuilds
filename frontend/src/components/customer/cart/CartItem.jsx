@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { ModelContext } from "../../../../context/ModelContext";
+import { ModelContext } from "../../../context/ModelContext";
 import STLImageGenarator from "../ModelRendering/3Dprinting/modelAnalysis/STLImageGenarator";
 
 const placeholderImage = "https://via.placeholder.com/150"; // Placeholder for missing/failed 3D model images.
