@@ -369,7 +369,7 @@ const handleSubmit = async () => {
               onClick={handleSubmit}
               style={{ marginTop: "20px" }}
             >
-              Submit Customization
+              {isEditMode ? "Save Configurations" : "Add to Cart"}
             </Button>
           )}
         </Box>

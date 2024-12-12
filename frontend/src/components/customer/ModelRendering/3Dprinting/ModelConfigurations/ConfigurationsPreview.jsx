@@ -15,11 +15,13 @@ const ConfigurationsPreview = ({ selectedOptions, customizations, onOptionChange
             <Typography variant="h6">Material</Typography>
             <Grid container spacing={2}>
               {customizations.materials.map((material) => (
-                <Grid item xs={4} key={material._id}>
+                <Grid item xs={3} key={material._id}>
                   <Card
                     onClick={() => onOptionChange("material", material.name)}
                     variant={selectedOptions.material === material.name ? "outlined" : "elevation"}
                     sx={{
+                      height: 100,
+                      width: 100,
                       cursor: "pointer",
                       border: selectedOptions.material === material.name ? "2px solid #1976d2" : "none",
                     }}
@@ -43,11 +45,13 @@ const ConfigurationsPreview = ({ selectedOptions, customizations, onOptionChange
             <Typography variant="h6">Finish</Typography>
             <Grid container spacing={2}>
               {customizations.finishes.map((finish) => (
-                <Grid item xs={4} key={finish._id}>
+                <Grid item xs={3} key={finish._id}>
                   <Card
                     onClick={() => onOptionChange("finish", finish.name)}
                     variant={selectedOptions.finish === finish.name ? "outlined" : "elevation"}
                     sx={{
+                      height: 100,
+                      width: 100,
                       cursor: "pointer",
                       border: selectedOptions.finish === finish.name ? "2px solid #1976d2" : "none",
                     }}
