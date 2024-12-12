@@ -156,8 +156,6 @@ const ModelPropertiesForm = ({ selectedOptions, handleOptionSelect, modelLink, i
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log("ordr", formData.fileUnits);
   
     // Create the order data with the actual STL model link
     const orderData = {

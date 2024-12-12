@@ -4,7 +4,7 @@ const Cart = require('../../models/customer/Cart');
 
 // Create a new order
 router.post('/add', async (req, res) => {
-    const { user_id, model, quantity, material, color, quality, specialInstructions, infilType, verticalResolution,  process, fileUnits, infill, layerHeight, technicalDrawing, printOrientation, tolerance, cosmeticSide, industryDescription, hardnessDescription } = req.body;
+    const { user_id, model, quantity, material, color, quality, specialInstructions, infilType, verticalResolution,  process, finish, fileUnits, infill, layerHeight, technicalDrawing, printOrientation, tolerance, cosmeticSide, industryDescription, hardnessDescription } = req.body;
 
     try {
         const newOrder = new Cart({
@@ -19,6 +19,7 @@ router.post('/add', async (req, res) => {
             verticalResolution,
             status: 1,
             process,
+            finish,
             fileUnits,
             infill,
             layerHeight,
@@ -82,6 +83,7 @@ router.put('/update/:id', async (req, res) => {
         infilType,
         verticalResolution,
         process,
+        finish,
         fileUnits,
         infill,
         layerHeight,
@@ -107,6 +109,7 @@ router.put('/update/:id', async (req, res) => {
                     infilType,
                     verticalResolution,
                     process,
+                    finish,
                     fileUnits,
                     infill,
                     layerHeight,

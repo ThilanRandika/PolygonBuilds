@@ -26,7 +26,6 @@ const cartSchema = new mongoose.Schema({
     },
     quality: {
         type: String, // Assuming quality is represented by an integer
-        required: true
     },
     specialInstructions: {
         type: String,
@@ -34,13 +33,14 @@ const cartSchema = new mongoose.Schema({
     },
     infilType: {
         type: String,
-        required: true,
     },
     verticalResolution: {
         type: String,
-        required: true,
     },
     process: {
+        type: String,
+    },
+    finish: {
         type: String,
     },
     fileUnits: {
