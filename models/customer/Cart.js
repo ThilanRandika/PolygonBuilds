@@ -26,7 +26,6 @@ const cartSchema = new mongoose.Schema({
     },
     quality: {
         type: String, // Assuming quality is represented by an integer
-        required: true
     },
     specialInstructions: {
         type: String,
@@ -34,11 +33,42 @@ const cartSchema = new mongoose.Schema({
     },
     infilType: {
         type: String,
-        required: true,
     },
     verticalResolution: {
         type: String,
-        required: true,
+    },
+    process: {
+        type: String,
+    },
+    finish: {
+        type: String,
+    },
+    fileUnits: {
+        type: String,
+    },
+    infill: {
+        type: String,
+    },
+    layerHeight: {
+        type: String,
+    },
+    technicalDrawing: {
+        type: String,
+    },
+    printOrientation: {
+        type: String,
+    },
+    tolerance: {
+        type: String,
+    },
+    cosmeticSide: {
+        type: String,
+    },
+    industryDescription: {
+        type: String,
+    },
+    hardnessDescription: {
+        type: String,
     },
     date: {
         type: Date,
