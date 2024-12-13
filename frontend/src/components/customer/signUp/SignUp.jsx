@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -13,12 +13,13 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
-import axios from 'axios'; // Add Axios for API requests
+import axios from 'axios';
+import ModelModal from './ModelModel';
+import { useNavigate } from 'react-router-dom';
 
-const Card = styled(MuiCard)(({ theme }) => ({
+const StyledCard = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  alignSelf: 'center',
   width: '100%',
   padding: theme.spacing(4),
   gap: theme.spacing(2),
@@ -39,7 +40,11 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignUp() {
-  const [formErrors, setFormErrors] = React.useState({});
+  const [formErrors, setFormErrors] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [userModels, setUserModels] = useState([]); // List of user models
+  const [userEmail, setUserEmail] = useState(''); // State to store user's email
+  const navigate = useNavigate()
 
   const validateInputs = (data) => {
     const errors = {};
@@ -67,6 +72,12 @@ export default function SignUp() {
     return errors;
   };
 
+  const handleModalClose = () => {
+    setShowModal(false);
+    handleDeleteAllModels();
+    // Redirect to sign-in page when modal is closed
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -85,35 +96,133 @@ export default function SignUp() {
     }
 
     try {
+      setUserEmail(formData.email); // Store the email in state
+
       const response = await axios.post('http://localhost:8070/api/customer/register', formData);
+      
       alert(response.data.message);
+      // Fetch user's models based on their email
+      const modelsResponse = await axios.get(`http://localhost:8070/api/file/models?email=${formData.email}`);
+      if (modelsResponse.data.models.length > 0) {
+        setUserModels(modelsResponse.data.models);
+        setShowModal(true);
+      }else {
+        navigate('/signin')
+      }
+      //registration success
+
+
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.error || 'An error occurred during registration.');
     }
   };
 
+const handleAddToCart = async (modelId, modelLink, imageUrl) => {
+  setUserModels((prevModels) => prevModels.filter((model) => model._id !== modelId));
+  try {
+    // Default values for required fields
+    const defaultCartData = {
+      user_id: "user123", // Replace with actual user ID (e.g., from context or session)
+      model: modelLink,
+      image: imageUrl,
+      quantity: 1,
+      material: "PLA", // Default material
+      color: "White", // Default color
+      quality: "Standard", // Default quality
+      specialInstructions: "None", // Default special instructions
+      infilType: "Grid", // Default infill type
+      verticalResolution: "0.2mm", // Default resolution
+      process: "FDM", // Default process
+      finish: "Matte", // Default finish
+      fileUnits: "mm", // Default file units
+      infill: "20%", // Default infill percentage
+      layerHeight: "0.2mm", // Default layer height
+      technicalDrawing: "Not required", // Default technical drawing
+      printOrientation: "Auto", // Default orientation
+      tolerance: "0.1mm", // Default tolerance
+      cosmeticSide: "None", // Default cosmetic side
+      industryDescription: "General", // Default description
+      hardnessDescription: "Standard", // Default hardness
+    };
+
+    // Send API request to add to cart
+    const response = await axios.post("http://localhost:8070/api/cart/add", defaultCartData);
+
+    if (response.status === 201) {
+      console.log("Model added to cart successfully:", response.data.order);
+      // Handle success (e.g., update UI or notify user)
+
+      // After successfully adding to cart, delete the file from the File collection
+      const deleteResponse = await axios.delete(`http://localhost:8070/api/file/deleteFile/${modelId}`);
+      if (deleteResponse.status === 200) {
+        console.log("File deleted successfully:", deleteResponse.data.message);
+        // Notify user of success if necessary
+      } else {
+        console.error("Failed to delete file:", deleteResponse.data.error);
+      }
+
+    } else {
+      console.error("Failed to add model to cart:", response.data.error);
+    }
+  } catch (error) {
+    console.error("Error adding model to cart:", error.response?.data || error.message);
+  }
+};
+
+
+const handleRemoveModel = async (modelId) => {
+  setUserModels((prevModels) => prevModels.filter((model) => model._id !== modelId));
+  try {
+    // Call the API to delete the model from the database
+    const deleteResponse = await axios.delete(`http://localhost:8070/api/file/deleteFile/${modelId}`);
+    
+    if (deleteResponse.status === 200) {
+      console.log("File deleted successfully:", deleteResponse.data.message);
+
+      // Update the local state to remove the model from the UI
+      setUserModels((prevModels) => prevModels.filter((model) => model.id !== modelId));
+    } else {
+      console.error("Failed to delete file:", deleteResponse.data.error);
+    }
+  } catch (error) {
+    console.error("Error deleting file:", error.response?.data || error.message);
+  }
+};
+
+const handleDeleteAllModels = async () => {
+  setUserModels(null);
+  try {
+    const response = await axios.delete('http://localhost:8070/api/file/deleteAll', {
+      data: { email: userEmail }, // Include email in the request body
+    });
+
+    if (response.status === 200) {
+      console.log('All models deleted successfully');
+      setUserModels([]); // Clear userModels in the UI
+      navigate('/signin')
+    } else {
+      console.error('Failed to delete all models:', response.data);
+    }
+  } catch (error) {
+    console.error('Error deleting all models:', error.response?.data || error.message);
+  }
+};
+
+
+
   return (
     <>
       <CssBaseline enableColorScheme />
       <SignUpContainer direction="column" justifyContent="center" alignItems="center">
-        <Card variant="outlined">
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-          >
+        <StyledCard variant="outlined">
+          <Typography component="h1" variant="h4" sx={{ fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
             Sign up
           </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-          >
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <FormControl>
               <FormLabel htmlFor="first_name">First Name</FormLabel>
               <TextField
-                autoComplete="given-name"
                 name="first_name"
                 required
                 fullWidth
@@ -127,7 +236,6 @@ export default function SignUp() {
             <FormControl>
               <FormLabel htmlFor="last_name">Last Name</FormLabel>
               <TextField
-                autoComplete="family-name"
                 name="last_name"
                 required
                 fullWidth
@@ -146,8 +254,6 @@ export default function SignUp() {
                 id="email"
                 placeholder="your@email.com"
                 name="email"
-                autoComplete="email"
-                variant="outlined"
                 error={!!formErrors.email}
                 helperText={formErrors.email}
               />
@@ -161,8 +267,6 @@ export default function SignUp() {
                 id="mobile"
                 placeholder="1234567890"
                 name="mobile"
-                autoComplete="tel"
-                variant="outlined"
                 error={!!formErrors.mobile}
                 helperText={formErrors.mobile}
               />
@@ -177,8 +281,6 @@ export default function SignUp() {
                 placeholder="••••••"
                 type="password"
                 id="password"
-                autoComplete="new-password"
-                variant="outlined"
                 error={!!formErrors.password}
                 helperText={formErrors.password}
               />
@@ -188,26 +290,31 @@ export default function SignUp() {
               control={<Checkbox value="allowExtraEmails" color="primary" />}
               label="I want to receive updates via email."
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-            >
+            <Button type="submit" fullWidth variant="contained">
               Sign up
             </Button>
           </Box>
           <Divider>
             <Typography sx={{ color: 'text.secondary' }}>or</Typography>
           </Divider>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography sx={{ textAlign: 'center' }}>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography>
               Already have an account?{' '}
-              <Link href="/login" variant="body2" sx={{ alignSelf: 'center' }}>
+              <Link href="/login" variant="body2">
                 Sign in
               </Link>
             </Typography>
           </Box>
-        </Card>
+        </StyledCard>
+
+        <ModelModal
+          open={showModal}
+          onClose={handleModalClose}
+          userModels={userModels}
+          handleAddToCart={handleAddToCart}
+          handleRemoveModel={handleRemoveModel}
+          handleDeleteAllModels={handleDeleteAllModels}
+        />
       </SignUpContainer>
     </>
   );
