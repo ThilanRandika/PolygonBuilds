@@ -51,11 +51,11 @@ const CartItem = ({
           className="flex-shrink-0 w-50 h-50 bg-gray-200 rounded-md overflow-hidden shadow-md cursor-pointer"
           onClick={handleImageClick}
         >
-          {!imageError ? (
+          {!item.image ? (
             <STLImageGenarator fileUrl={item.model} />
           ) : (
             <img
-              src={placeholderImage}
+              src={item.image}
               alt="3D model preview"
               className="w-full h-full object-cover"
               onError={handleImageError}
