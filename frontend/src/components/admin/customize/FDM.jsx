@@ -4,7 +4,7 @@ import axios from "axios";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from '../../../firebase/firebaseConfig';
 
-function FDM() {
+function FDM({ onCustomizationChange }) {
   const [process, setProcess] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [finish, setFinish] = useState([]);
@@ -90,6 +90,7 @@ function FDM() {
           customization,
         });
         alert(response.data.message);  // Show success message
+        onCustomizationChange(); // Notify parent about the change
       } catch (error) {
         console.error(`Error adding ${type}:`, error);
         alert(`Failed to add ${type}.`);
