@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import * as THREE from "three";
 import { STLLoader } from "three-stdlib";
 import { OrbitControls } from "three-stdlib";
@@ -8,9 +8,9 @@ import {
   FaRegEye,
   FaRegEyeSlash,
 } from "react-icons/fa";
+import { ModelContext } from "../../../../../context/ModelContext";
 
 const STLViewer = () => {
-  const [uploadedFile, setUploadedFile] = useState(null);
   const [isXray, setIsXray] = useState(false);
   const [mesh, setMesh] = useState(null);
   const [controls, setControls] = useState(null);
@@ -23,19 +23,15 @@ const STLViewer = () => {
   const [surfaceArea, setSurfaceArea] = useState(0);
   const [volume, setVolume] = useState(0);
   const [unit, setUnit] = useState("mm");
+  const [loading, setLoading] = useState(false); // Add loading state
+  const { modelLink } = useContext(ModelContext); // Access modelLink from context
 
   useEffect(() => {
-    const fileURL = localStorage.getItem("uploadedFileURL");
-    if (fileURL) {
-      setUploadedFile(fileURL);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (uploadedFile) {
+    if (modelLink) {
+      setLoading(true); // Start loader
       loadSTL();
     }
-  }, [uploadedFile]);
+  }, [modelLink]);
 
   const loadSTL = () => {
     const scene = new THREE.Scene();
@@ -64,7 +60,7 @@ const STLViewer = () => {
 
     const loader = new STLLoader();
     loader.load(
-      uploadedFile,
+      modelLink,
       (geometry) => {
         const material = new THREE.MeshPhongMaterial({ color: 0xc0c0c0 });
         const newMesh = new THREE.Mesh(geometry, material);
@@ -102,9 +98,13 @@ const STLViewer = () => {
           renderer.render(scene, newCamera);
         };
         animate();
+        setLoading(false); // Stop loader on error
       },
       undefined,
-      (error) => console.error("Error loading STL:", error)
+      (error) => {
+        console.error("Error loading STL:", error);
+        setLoading(false); // Stop loader on error
+      }
     );
 
     window.addEventListener("resize", () => {
@@ -186,7 +186,24 @@ const STLViewer = () => {
     <div style={{ width: "320px" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <div style={{ position: "relative", width: "370px", height: "424px" }}>
-          <div id="viewer" style={{ width: "100%", height: "100%" }}></div>
+        {loading && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                zIndex: 10,
+              }}
+            >
+              <p>Loading model...</p>
+            </div>
+          )}
+          <div id="viewer" style={{ width: "100%", height: "100%" }}>
+          </div>
           <div
             style={{
               position: "absolute",

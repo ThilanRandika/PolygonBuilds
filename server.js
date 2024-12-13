@@ -7,6 +7,17 @@ const app = express();
 require("dotenv").config();
 
 
+// Import admin routes
+const customizationRoute = require("./routes/admin/customization");
+const adminOrderRoute = require("./routes/admin/order");
+
+// Import customer routes
+const customerRoute = require("./routes/customer/customer");
+const orderRoute = require("./routes/customer/order");
+const cartRoute = require("./routes/customer/cart");
+const fileRoute = require("./routes/customer/file");
+
+
 const PORT = process.env.PORT || 8070;
 // Allow requests from the specified origin
 const corsOptions = {
@@ -33,6 +44,17 @@ connection.once("open", ()=> {
     console.log("Mongodb Connection Success!");
 
 })
+
+
+// Use admin routs
+app.use("/api/customization", customizationRoute);
+app.use("/api/adminOrder", adminOrderRoute);
+
+// Use customer routs
+app.use("/api/customer", customerRoute);
+app.use("/api/order", orderRoute);
+app.use("/api/cart", cartRoute);
+app.use("/api/file", fileRoute);
 
 
 app.listen(PORT,() =>{
