@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
     user_id: {
         type: String, // Refers to a user from the Customer model
-        // ref: 'Customer',
         required: true
     },
     model: {
@@ -45,8 +44,22 @@ const orderSchema = new mongoose.Schema({
         default: Date.now  // Automatically sets the order date to current date
     },
     status: {
-        type: String,  // 1: Active, 0: Inactive/Completed
+        type: String,  // Status of the order
         default: "Quotation Pending"
+    },
+    quotation: {
+        fileUrl: {
+            type: String, // URL to the uploaded quotation file
+            required: false
+        },
+        date: {
+            type: Date, // Date the quotation was added
+            default: null
+        },
+        specialNotes: {
+            type: String, // Optional notes about the quotation
+            required: false
+        }
     }
 }, {
     timestamps: true  // Adds createdAt and updatedAt fields automatically

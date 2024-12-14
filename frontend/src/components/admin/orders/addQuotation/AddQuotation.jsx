@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import AddQuotationForm from './AddQuotationForm';
 import OrderDetailsPreview from './OrderDetailsPreview';
-import { CircularProgress, Typography, Box } from '@mui/material';
+import { CircularProgress, Typography, Box, Grid2 } from '@mui/material';
 
 function AddQuotation() {
   const { id } = useParams(); // Get the order ID from the URL
@@ -37,21 +37,22 @@ function AddQuotation() {
   }
 
   return (
+    
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
         Add Quotation for Order
       </Typography>
 
-      <Box
-        sx={{ display: 'flex', gap: 5 }}
-      >
-        {/* Add Quotation Form */}
-        <AddQuotationForm orderId={id} />
- 
-        {/* Display Order Details */}
-        <OrderDetailsPreview order={order} />
-      </Box>
-
+      <Grid2 container spacing={2} sx={{ flexGrow: 1 }}>
+        <Grid2 size={6}>
+          {/* Add Quotation Form */}
+          <AddQuotationForm orderId={id} />
+        </Grid2>
+        <Grid2 size={6}>
+          {/* Display Order Details */}
+          <OrderDetailsPreview order={order} />
+        </Grid2>
+      </Grid2>
       
     </Box>
   );
