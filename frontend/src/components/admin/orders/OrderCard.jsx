@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
@@ -13,10 +14,10 @@ import defaultImage from '../../../assets/images/default3DModel.png';
 
 function OrderCard({ order }) {
   const {
+    _id,
+    updatedAt,
     customerName,
     itemsCount,
-    orderNumber,
-    updateTime,
     productImage,
     productName,
     productDetails,
@@ -27,11 +28,19 @@ function OrderCard({ order }) {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const navigate = useNavigate(); // Initialize navigate
+
   const handleDropDownClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleDropDownClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleAddQuotation = () => {
+    handleDropDownClose();
+    navigate(`/admin/orders/${_id}/addQuotation`);// Navigate to the URL with the _id
   };
 
   return (
@@ -51,10 +60,10 @@ function OrderCard({ order }) {
         </Box>
         <Box>
           <Typography variant="body2" color="text.secondary">
-            Order Number: <span style={{ fontWeight: 'bold' }}>{orderNumber}</span>
+            Order Number: <span style={{ fontWeight: 'bold' }}>{_id}</span>
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Update Time: <span style={{ fontWeight: 'bold' }}>{updateTime}</span>
+            Update Time: <span style={{ fontWeight: 'bold' }}>{updatedAt}</span>
           </Typography>
         </Box>
       </Box>
@@ -83,8 +92,7 @@ function OrderCard({ order }) {
               Rs. {price}
             </Typography>
           ) : (
-            <Typography variant="body2" color="text.secondary">
-            </Typography>
+            <Typography variant="body2" color="text.secondary"></Typography>
           )}
           <Typography variant="body1" color="error.main" fontWeight="bold">
             X {quantity}
@@ -102,8 +110,8 @@ function OrderCard({ order }) {
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
                 onClick={handleDropDownClick}
-                variant="outlined" 
-                color="primary" 
+                variant="outlined"
+                color="primary"
                 size="small"
                 sx={{ width: '100%' }}
               >
@@ -120,10 +128,7 @@ function OrderCard({ order }) {
               >
                 {/* Conditional rendering for "Add Quotation" */}
                 {status === 'Quotation Pending' && (
-                  <MenuItem onClick={() => {
-                    handleDropDownClose();
-                    console.log('Add Quotation clicked');
-                  }}>
+                  <MenuItem onClick={handleAddQuotation}>
                     Add Quotation
                   </MenuItem>
                 )}
@@ -137,7 +142,6 @@ function OrderCard({ order }) {
                   </MenuItem>
                 )}
               </Menu>
-
             </div>
           </Box>
         </Box>

@@ -18,4 +18,24 @@ router.get('/all-orders', async (req, res) => {
 
 
 
+// Get order details by ID
+router.get('/order/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await Order.findById(id);
+
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        res.status(200).json(order);
+    } catch (err) {
+        console.error('Error fetching order details:', err);
+        res.status(500).json({ error: 'Failed to fetch order details' });
+    }
+});
+
+
+
+
 module.exports = router;
