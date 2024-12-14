@@ -5,14 +5,12 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from '../../../firebase/firebaseConfig';
 
 function FDM({ onCustomizationChange }) {
-  const [process, setProcess] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [finish, setFinish] = useState([]);
   const [layerHeight, setLayerHeight] = useState([]);
   const [color, setColor] = useState([]);
   const [infill, setInfill] = useState([]);
 
-  const [newProcess, setNewProcess] = useState({ name: ""});
   const [newMaterial, setNewMaterial] = useState({ name: "", image: "" });
   const [newFinish, setNewFinish] = useState({ name: "", image: "" });
   const [newLayerHeight, setNewLayerHeight] = useState({ name: ""});
@@ -146,12 +144,6 @@ function FDM({ onCustomizationChange }) {
     setImageFile(null);  // Clear the selected image file
   };
 
-  const handleAddProcess = () => {
-    handleAddCustomization("processes", newProcess);
-    setNewProcess({ name: "" });
-    setImageFile(null);  // Clear the selected image file
-  };
-
   const handleAddLayerHeight = () => {
     handleAddCustomization("layerHeights", newLayerHeight);
     setNewLayerHeight({ name: "" });
@@ -172,15 +164,6 @@ function FDM({ onCustomizationChange }) {
   return (
     <div>
       FDM
-      {/* Form for Adding New Process */}
-      <Typography variant="h6" gutterBottom>Add New Process</Typography>
-      <TextField
-        label="Process Name"
-        fullWidth
-        value={newProcess.name}
-        onChange={(e) => setNewProcess({...newProcess, name: e.target.value })}
-        />
-        <Button onClick={handleAddProcess} disabled={uploading}>Add Process</Button>
 
       {/* Form for Adding New Material */}
       <Typography variant="h6" gutterBottom>Add New Material</Typography>

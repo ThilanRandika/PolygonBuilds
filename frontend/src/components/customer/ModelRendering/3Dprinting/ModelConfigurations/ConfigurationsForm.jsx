@@ -19,6 +19,7 @@ import ConfigurationsPreview from "./ConfigurationsPreview";
 
 const ConfigurationsForm = ({ itemDetails, isEditMode, cartId, modelLink }) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // State to track overall loading
   const [process, setProcess] = useState("");
   const [customizations, setCustomizations] = useState({});
   const [selectedOptions, setSelectedOptions] = useState({});
@@ -82,6 +83,7 @@ const ConfigurationsForm = ({ itemDetails, isEditMode, cartId, modelLink }) => {
 
   // Fetch customizations based on the selected process
   const fetchCustomizations = async (process) => {
+    setLoading(true); // Start overall loading
     try {
       const endpoint =
         process === "FDM"
@@ -91,6 +93,8 @@ const ConfigurationsForm = ({ itemDetails, isEditMode, cartId, modelLink }) => {
       setCustomizations(response.data);
     } catch (error) {
       console.error("Error fetching customizations:", error);
+    } finally {
+        setLoading(false); // Stop overall loading
     }
   };
 
@@ -381,6 +385,7 @@ const handleSubmit = async () => {
           selectedOptions={selectedOptions}
           customizations={customizations}
           onOptionChange={handleOptionChange}
+          loading={loading}
         />
       </Box>
       
