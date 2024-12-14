@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const fileSchema = new mongoose.Schema({
     email: { type: String, required: true },
     type: { type: String, required: true },
-    fileURL: { type: String, required: true },
+    fileUrl: { type: String, required: true },
+    imageUrl: { type: String, required: true },
     uploadedAt: { type: Date, default: Date.now },
   });
   
