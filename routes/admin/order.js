@@ -55,7 +55,7 @@ router.post('/addQuotation/:id', async (req, res) => {
                         date: new Date(),
                         specialNotes
                     },
-                    status: "Quotation Added"
+                    status: "Payment Pending"
                 }
             },
             { new: true } // Return the updated document

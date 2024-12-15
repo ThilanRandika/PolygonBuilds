@@ -79,15 +79,13 @@ const Cart = () => {
   
       // Map the cart items to include necessary data for the API call
       const orderPayload = selectedCartItems.map((item) => ({
+        _id: item._id,
         model: item.model,
         image: item.image,
         quantity: quantities[item._id] || item.quantity,
         material: item.material,
         color: item.color,
-        quality: item.quality,
         specialInstructions: item.specialInstructions,
-        infilType: item.infilType,
-        verticalResolution: item.verticalResolution,
         process: item.process,
         finish: item.finish,
         fileUnits: item.fileUnits,

@@ -41,10 +41,15 @@ router.post('/create-multiple-orders', async (req, res) => {
         return res.status(400).json({ error: 'No items selected for order' });
     }
 
+    console.log('Cart items to delete:', cartItems);
+    console.log('Mapped IDs:', cartItems.map(item => item._id));
+    console.log('User ID:', user_id);
+
+
     try {
         // Create orders from cart items
         const orders = cartItems.map(item => {
-                const { model, image, quantity, material, color, specialInstructions, process, finish, fileUnits, infill, layerHeight, technicalDrawing, printOrientation, tolerance, cosmeticSide, industryDescription, hardnessDescription } = item;
+                const { _id, model, image, quantity, material, color, specialInstructions, process, finish, fileUnits, infill, layerHeight, technicalDrawing, printOrientation, tolerance, cosmeticSide, industryDescription, hardnessDescription } = item;
             return new Order({
                 user_id,
                 model,

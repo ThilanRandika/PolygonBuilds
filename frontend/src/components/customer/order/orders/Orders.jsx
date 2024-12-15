@@ -4,7 +4,7 @@ import { CircularProgress, Typography } from '@mui/material';
 import OrderTabs from '../../../customer/order/orders/OrderTabs';
 
 function Orders() {
-  const UserID = 'userId';
+  const UserID = 'USER_ID_PLACEHOLDER';
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
