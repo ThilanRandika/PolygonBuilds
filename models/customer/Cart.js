@@ -28,18 +28,9 @@ const cartSchema = new mongoose.Schema({
         type: String, // Assuming color is an integer representing some color code
         required: true
     },
-    quality: {
-        type: String, // Assuming quality is represented by an integer
-    },
     specialInstructions: {
         type: String,
         required: true,
-    },
-    infilType: {
-        type: String,
-    },
-    verticalResolution: {
-        type: String,
     },
     process: {
         type: String,
