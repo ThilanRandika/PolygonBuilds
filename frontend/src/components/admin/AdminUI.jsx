@@ -15,7 +15,7 @@ function AdminUI() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/customize" element={<Customize />} />
-              <Route path="/orders" element={<Orders />} />
+              <Route path="/orders/*" element={<Orders />} />
               <Route path="/manufacturers" element={<Manufacturers />} />
               <Route path="/profile" element={<Profile />} />
             </Routes>

@@ -1,10 +1,21 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { CircularProgress, Typography } from '@mui/material';
-import OrderTabs from '../../../customer/order/orders/OrderTabs';
+import OrderTabs from './OrderTabs';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  CircularProgress,
+  Button,
+  Link,
+} from '@mui/material';
 
-function Orders() {
-  const UserID = 'USER_ID_PLACEHOLDER';
+const OrdersDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,7 +23,7 @@ function Orders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get(`http://localhost:8070/api/order/user-orders/${UserID}`);
+        const response = await axios.get('http://localhost:8070/api/adminOrder/all-orders');
         setOrders(response.data);
       } catch (error) {
         console.error('Error fetching orders:', error);
@@ -24,8 +35,6 @@ function Orders() {
 
     fetchOrders();
   }, []);
-
-  console.log('orders', orders);
 
   if (isLoading) return <CircularProgress />; // Show loading spinner while fetching data
 
@@ -45,7 +54,7 @@ function Orders() {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Orders
+export default OrdersDashboard;

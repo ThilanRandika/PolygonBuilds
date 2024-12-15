@@ -4,15 +4,13 @@ import axios from "axios";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from '../../../firebase/firebaseConfig';
 
-function SLA() {
-  const [process, setProcess] = useState([]);
+function SLA({ onCustomizationChange }) {
   const [materials, setMaterials] = useState([]);
   const [finish, setFinish] = useState([]);
   const [layerHeight, setLayerHeight] = useState([]);
   const [color, setColor] = useState([]);
   // const [infill, setInfill] = useState([]);
 
-  const [newProcess, setNewProcess] = useState({ name: ""});
   const [newMaterial, setNewMaterial] = useState({ name: "", image: "" });
   const [newFinish, setNewFinish] = useState({ name: "", image: "" });
   const [newLayerHeight, setNewLayerHeight] = useState({ name: ""});
@@ -90,6 +88,7 @@ function SLA() {
           customization,
         });
         alert(response.data.message);  // Show success message
+        onCustomizationChange(); // Notify parent about the change
       } catch (error) {
         console.error(`Error adding ${type}:`, error);
         alert(`Failed to add ${type}.`);
@@ -145,12 +144,6 @@ function SLA() {
     setImageFile(null);  // Clear the selected image file
   };
 
-  const handleAddProcess = () => {
-    handleAddCustomization("processes", newProcess);
-    setNewProcess({ name: "" });
-    setImageFile(null);  // Clear the selected image file
-  };
-
   const handleAddLayerHeight = () => {
     handleAddCustomization("layerHeights", newLayerHeight);
     setNewLayerHeight({ name: "" });
@@ -168,15 +161,6 @@ function SLA() {
   return (
     <div>
       SLA
-      {/* Form for Adding New Process */}
-      <Typography variant="h6" gutterBottom>Add New Process</Typography>
-      <TextField
-        label="Process Name"
-        fullWidth
-        value={newProcess.name}
-        onChange={(e) => setNewProcess({...newProcess, name: e.target.value })}
-        />
-        <Button onClick={handleAddProcess} disabled={uploading}>Add Process</Button>
 
       {/* Form for Adding New Material */}
       <Typography variant="h6" gutterBottom>Add New Material</Typography>

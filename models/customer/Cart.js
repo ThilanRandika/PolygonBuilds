@@ -12,6 +12,10 @@ const cartSchema = new mongoose.Schema({
         required: true,
         maxlength: 500
     },
+    image: {
+        type: String,
+        maxlength: 500
+    },
     quantity: {
         type: Number,
         required: true,
@@ -24,18 +28,9 @@ const cartSchema = new mongoose.Schema({
         type: String, // Assuming color is an integer representing some color code
         required: true
     },
-    quality: {
-        type: String, // Assuming quality is represented by an integer
-    },
     specialInstructions: {
         type: String,
         required: true,
-    },
-    infilType: {
-        type: String,
-    },
-    verticalResolution: {
-        type: String,
     },
     process: {
         type: String,

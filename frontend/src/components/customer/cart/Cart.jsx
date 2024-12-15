@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import CartItem from './CartItem'; // Import the new component
+import { AuthContext } from '../../../context/AuthContext';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -11,6 +12,8 @@ const Cart = () => {
   const [quantities, setQuantities] = useState({});
   const [expandedItems, setExpandedItems] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const {user} = useContext(AuthContext);
+
 
   useEffect(() => {
     fetchCartItems();
@@ -65,16 +68,60 @@ const Cart = () => {
     const decodedFilePath = decodeURIComponent(filePath); // Decode URL-encoded characters
     const fileName = decodedFilePath.replace('files/', ''); // Remove 'files/' from the decoded path
     return fileName; // Return the cleaned file name
-};
+  };
 
   const confirmOrder = async () => {
+    if (selectedItems.length === 0) {
+      alert("No items selected for order!");
+      return;
+    }
+  
     try {
-      console.log("Order confirmed");
-      setIsPopupOpen(false);
+      // Filter the selected cart items
+      const selectedCartItems = cartItems.filter((item) => selectedItems.includes(item._id));
+  
+      // Map the cart items to include necessary data for the API call
+      const orderPayload = selectedCartItems.map((item) => ({
+        _id: item._id,
+        model: item.model,
+        image: item.image,
+        quantity: quantities[item._id] || item.quantity,
+        material: item.material,
+        color: item.color,
+        specialInstructions: item.specialInstructions,
+        process: item.process,
+        finish: item.finish,
+        fileUnits: item.fileUnits,
+        infill: item.infill,
+        layerHeight: item.layerHeight,
+        technicalDrawing: item.technicalDrawing,
+        printOrientation: item.printOrientation,
+        tolerance: item.tolerance,
+        cosmeticSide: item.cosmeticSide,
+        industryDescription: item.industryDescription,
+        hardnessDescription: item.hardnessDescription,
+      }));
+
+  
+      // API call to create orders
+      const response = await axios.post('http://localhost:8070/api/order/create-multiple-orders', {
+        user_id: user._id,
+        cartItems: orderPayload,
+      });
+  
+      if (response.status === 201) {
+        alert("Orders confirmed successfully!");
+        setIsPopupOpen(false);
+  
+        // Refresh the cart after successful order creation
+        fetchCartItems();
+      }
     } catch (error) {
       console.error("Error confirming order:", error);
+      alert("Failed to confirm order. Please try again.");
     }
   };
+  
 
   return (
     <div className="mx-10 p-8">
