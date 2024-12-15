@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import {
   Container,
@@ -16,8 +16,10 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { Navigate, useNavigate } from "react-router-dom";
 import ConfigurationsPreview from "./ConfigurationsPreview";
+import { AuthContext } from "../../../../../context/AuthContext";
 
 const ConfigurationsForm = ({ itemDetails, isEditMode, cartId, modelLink }) => {
+  const {user} = useContext(AuthContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false); // State to track overall loading
   const [process, setProcess] = useState("");
@@ -126,7 +128,7 @@ const ConfigurationsForm = ({ itemDetails, isEditMode, cartId, modelLink }) => {
 const handleSubmit = async () => {
   // Combine all fields into one flat object
   const submissionData = {
-    user_id: "user_id_placeholder", // Replace with actual user ID
+    user_id: user._id,
     model: modelLink,
     process,
     ...selectedOptions,

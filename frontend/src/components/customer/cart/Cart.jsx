@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import CartItem from './CartItem'; // Import the new component
+import { AuthContext } from '../../../context/AuthContext';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -11,6 +12,8 @@ const Cart = () => {
   const [quantities, setQuantities] = useState({});
   const [expandedItems, setExpandedItems] = useState({});
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const {user} = useContext(AuthContext);
+
 
   useEffect(() => {
     fetchCartItems();
@@ -99,11 +102,10 @@ const Cart = () => {
         hardnessDescription: item.hardnessDescription,
       }));
 
-      console.log('orderPayload', orderPayload);
   
       // API call to create orders
       const response = await axios.post('http://localhost:8070/api/order/create-multiple-orders', {
-        user_id: "USER_ID_PLACEHOLDER", // Replace with actual user ID from authentication context
+        user_id: user._id,
         cartItems: orderPayload,
       });
   

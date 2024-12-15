@@ -1,6 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import ModelPropertiesForm from "./ModelPropertiesForm";
-import SelectionOptions from "./SelectionOptions";
 import STLViewer from "../modelAnalysis/STLViewer";
 import { Box } from '@mui/material';
 import { useLocation } from "react-router-dom";
