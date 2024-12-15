@@ -65,16 +65,63 @@ const Cart = () => {
     const decodedFilePath = decodeURIComponent(filePath); // Decode URL-encoded characters
     const fileName = decodedFilePath.replace('files/', ''); // Remove 'files/' from the decoded path
     return fileName; // Return the cleaned file name
-};
+  };
 
   const confirmOrder = async () => {
+    if (selectedItems.length === 0) {
+      alert("No items selected for order!");
+      return;
+    }
+  
     try {
-      console.log("Order confirmed");
-      setIsPopupOpen(false);
+      // Filter the selected cart items
+      const selectedCartItems = cartItems.filter((item) => selectedItems.includes(item._id));
+  
+      // Map the cart items to include necessary data for the API call
+      const orderPayload = selectedCartItems.map((item) => ({
+        model: item.model,
+        image: item.image,
+        quantity: quantities[item._id] || item.quantity,
+        material: item.material,
+        color: item.color,
+        quality: item.quality,
+        specialInstructions: item.specialInstructions,
+        infilType: item.infilType,
+        verticalResolution: item.verticalResolution,
+        process: item.process,
+        finish: item.finish,
+        fileUnits: item.fileUnits,
+        infill: item.infill,
+        layerHeight: item.layerHeight,
+        technicalDrawing: item.technicalDrawing,
+        printOrientation: item.printOrientation,
+        tolerance: item.tolerance,
+        cosmeticSide: item.cosmeticSide,
+        industryDescription: item.industryDescription,
+        hardnessDescription: item.hardnessDescription,
+      }));
+
+      console.log('orderPayload', orderPayload);
+  
+      // API call to create orders
+      const response = await axios.post('http://localhost:8070/api/order/create-multiple-orders', {
+        user_id: "USER_ID_PLACEHOLDER", // Replace with actual user ID from authentication context
+        cartItems: orderPayload,
+      });
+  
+      if (response.status === 201) {
+        alert("Orders confirmed successfully!");
+        setIsPopupOpen(false);
+  
+        // Refresh the cart after successful order creation
+        fetchCartItems();
+      }
     } catch (error) {
       console.error("Error confirming order:", error);
+      alert("Failed to confirm order. Please try again.");
     }
   };
+  
 
   return (
     <div className="mx-10 p-8">

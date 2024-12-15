@@ -11,6 +11,10 @@ const orderSchema = new mongoose.Schema({
         required: true,
         maxlength: 500
     },
+    image: {
+        type: String,
+        maxlength: 500
+    },
     quantity: {
         type: Number,
         required: true,
@@ -23,21 +27,42 @@ const orderSchema = new mongoose.Schema({
         type: String, // Assuming color is an integer representing some color code
         required: true
     },
-    quality: {
-        type: String, // Assuming quality is represented by an integer
-        required: true
-    },
     specialInstructions: {
         type: String,
         required: true,
     },
-    infilType: {
+    process: {
         type: String,
-        required: true,
     },
-    verticalResolution: {
+    finish: {
         type: String,
-        required: true,
+    },
+    fileUnits: {
+        type: String,
+    },
+    infill: {
+        type: String,
+    },
+    layerHeight: {
+        type: String,
+    },
+    technicalDrawing: {
+        type: String,
+    },
+    printOrientation: {
+        type: String,
+    },
+    tolerance: {
+        type: String,
+    },
+    cosmeticSide: {
+        type: String,
+    },
+    industryDescription: {
+        type: String,
+    },
+    hardnessDescription: {
+        type: String,
     },
     date: {
         type: Date,
