@@ -26,7 +26,7 @@ function SLA({ onCustomizationChange }) {
   // Function to check if a customization exists without updating the database
   const checkCustomizationExists = async (type, customization) => {
     try {
-      const response = await axios.post("http://localhost:8070/api/customization/sla/check-existence", {
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customization/sla/check-existence`, {
         type,
         customization,
       });
@@ -83,7 +83,7 @@ function SLA({ onCustomizationChange }) {
         }
 
         // Proceed to add the customization if it does not exist
-        const response = await axios.post("http://localhost:8070/api/customization/sla/add-customization", {
+        const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customization/sla/add-customization`, {
           type,
           customization,
         });
@@ -105,7 +105,7 @@ function SLA({ onCustomizationChange }) {
           pendingUpdate.customization.image = imageUrl;  // Set the Firebase URL to the image field
         }
 
-        const response = await axios.post("http://localhost:8070/api/customization/sla/add-customization", {
+        const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customization/sla/add-customization`, {
           type: pendingUpdate.type,
           customization: pendingUpdate.customization,
         });

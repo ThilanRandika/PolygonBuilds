@@ -98,11 +98,11 @@ export default function SignUp() {
     try {
       setUserEmail(formData.email); // Store the email in state
 
-      const response = await axios.post('http://localhost:8070/api/customer/register', formData);
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customer/register`, formData);
       
       alert(response.data.message);
       // Fetch user's models based on their email
-      const modelsResponse = await axios.get(`http://localhost:8070/api/file/models?email=${formData.email}`);
+      const modelsResponse = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/file/models?email=${formData.email}`);
       if (modelsResponse.data.models.length > 0) {
         setUserModels(modelsResponse.data.models);
         setShowModal(true);
@@ -147,14 +147,14 @@ const handleAddToCart = async (modelId, modelLink, imageUrl) => {
     };
 
     // Send API request to add to cart
-    const response = await axios.post("http://localhost:8070/api/cart/add", defaultCartData);
+    const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/cart/add`, defaultCartData);
 
     if (response.status === 201) {
       console.log("Model added to cart successfully:", response.data.order);
       // Handle success (e.g., update UI or notify user)
 
       // After successfully adding to cart, delete the file from the File collection
-      const deleteResponse = await axios.delete(`http://localhost:8070/api/file/deleteFile/${modelId}`);
+      const deleteResponse = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/file/deleteFile/${modelId}`);
       if (deleteResponse.status === 200) {
         console.log("File deleted successfully:", deleteResponse.data.message);
         // Notify user of success if necessary
@@ -175,7 +175,7 @@ const handleRemoveModel = async (modelId) => {
   setUserModels((prevModels) => prevModels.filter((model) => model._id !== modelId));
   try {
     // Call the API to delete the model from the database
-    const deleteResponse = await axios.delete(`http://localhost:8070/api/file/deleteFile/${modelId}`);
+    const deleteResponse = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/file/deleteFile/${modelId}`);
     
     if (deleteResponse.status === 200) {
       console.log("File deleted successfully:", deleteResponse.data.message);
@@ -193,7 +193,7 @@ const handleRemoveModel = async (modelId) => {
 const handleDeleteAllModels = async () => {
   setUserModels(null);
   try {
-    const response = await axios.delete('http://localhost:8070/api/file/deleteAll', {
+    const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/file/deleteAll`, {
       data: { email: userEmail }, // Include email in the request body
     });
 

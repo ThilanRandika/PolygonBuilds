@@ -72,7 +72,7 @@ export default function SignInCard() {
     dispatch({ type: 'LOGIN_START' });
 
     try {
-      const response = await axios.post('http://localhost:8070/api/customer/login', formData, { withCredentials: true });
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customer/login`, formData, { withCredentials: true });
       dispatch({ type: 'LOGIN_SUCCESS', payload: response.data.user });
       alert(response.data.message);
       navigate('/');

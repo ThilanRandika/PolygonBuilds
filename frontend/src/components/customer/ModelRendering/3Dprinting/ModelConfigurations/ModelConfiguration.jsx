@@ -32,7 +32,7 @@ function ModelConfiguration() {
   const fetchCartItem = async (itemId) => {
     try {
       console.log("Fetching item with ID: ", itemId);
-      const response = await axios.get(`http://localhost:8070/api/cart/cartItem/${itemId}`);
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/cart/cartItem/${itemId}`);
       setItemDetails(response.data);
       setModelLink(response.data.model); // Set model link after item details are fetched
     } catch (error) {

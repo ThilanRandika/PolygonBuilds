@@ -12,7 +12,7 @@ function Orders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get(`http://localhost:8070/api/order/user-orders/${UserID}`);
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/order/user-orders/${UserID}`);
         setOrders(response.data);
       } catch (error) {
         console.error('Error fetching orders:', error);

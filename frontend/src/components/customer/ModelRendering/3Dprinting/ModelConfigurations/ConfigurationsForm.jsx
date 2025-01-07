@@ -89,8 +89,8 @@ const ConfigurationsForm = ({ itemDetails, isEditMode, cartId, modelLink }) => {
     try {
       const endpoint =
         process === "FDM"
-          ? "http://localhost:8070/api/customization/fdm/all-customizations"
-          : "http://localhost:8070/api/customization/sla/all-customizations";
+          ? `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customization/fdm/all-customizations`
+          : `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customization/sla/all-customizations`;
       const response = await axios.get(endpoint);
       setCustomizations(response.data);
     } catch (error) {
@@ -141,7 +141,7 @@ const handleSubmit = async () => {
     if (isEditMode) {
       // Update existing cart item
       const response = await axios.put(
-        `http://localhost:8070/api/cart/update/${cartId}`,
+        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/cart/update/${cartId}`,
         submissionData
       );
       console.log("Update Response:", response.data);
@@ -149,7 +149,7 @@ const handleSubmit = async () => {
     } else {
       // Add new cart item
       const response = await axios.post(
-        "http://localhost:8070/api/cart/add",
+        `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/cart/add`,
         submissionData
       );
       console.log("Add Response:", response.data);

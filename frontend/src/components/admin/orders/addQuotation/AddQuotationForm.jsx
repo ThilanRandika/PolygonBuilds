@@ -59,7 +59,7 @@ function AddQuotationForm({ orderId }) {
 
           try {
             const response = await axios.post(
-              `http://localhost:8070/api/adminOrder/addQuotation/${orderId}`,
+              `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/adminOrder/addQuotation/${orderId}`,
               payload
             );
             setMessage('Quotation submitted successfully!');
