@@ -21,7 +21,7 @@ const fileRoute = require("./routes/customer/file");
 const PORT = process.env.PORT || 8070;
 // Allow requests from the specified origin
 const corsOptions = {
-    origin: 'http://localhost:5173', // Change this to your frontend URL
+    origin: process.env.FRONTEND_URL, // Use the FRONTEND_URL from .env (FRONTEND_URL=http://localhost:5173)
     credentials: true, // Include credentials (cookies, authorization headers, etc.)
   };
   
@@ -55,6 +55,11 @@ app.use("/api/customer", customerRoute);
 app.use("/api/order", orderRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/file", fileRoute);
+
+console.log("Server is running on port:", process.env.PORT);
+console.log("Connecting to MongoDB URL:", process.env.MONGODB_URL);
+console.log("Frontend URL:", process.env.FRONTEND_URL);
+
 
 
 app.listen(PORT,() =>{
