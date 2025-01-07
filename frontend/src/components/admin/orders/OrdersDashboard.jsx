@@ -23,7 +23,7 @@ const OrdersDashboard = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://localhost:8070/api/adminOrder/all-orders');
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/adminOrder/all-orders`);
         setOrders(response.data);
       } catch (error) {
         console.error('Error fetching orders:', error);

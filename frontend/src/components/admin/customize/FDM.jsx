@@ -26,7 +26,7 @@ function FDM({ onCustomizationChange }) {
   // Function to check if a customization exists without updating the database
   const checkCustomizationExists = async (type, customization) => {
     try {
-      const response = await axios.post("http://localhost:8070/api/customization/fdm/check-existence", {
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customization/fdm/check-existence`, {
         type,
         customization,
       });
@@ -83,7 +83,7 @@ function FDM({ onCustomizationChange }) {
         }
 
         // Proceed to add the customization if it does not exist
-        const response = await axios.post("http://localhost:8070/api/customization/fdm/add-customization", {
+        const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customization/fdm/add-customization`, {
           type,
           customization,
         });
@@ -105,7 +105,7 @@ function FDM({ onCustomizationChange }) {
           pendingUpdate.customization.image = imageUrl;  // Set the Firebase URL to the image field
         }
 
-        const response = await axios.post("http://localhost:8070/api/customization/fdm/add-customization", {
+        const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customization/fdm/add-customization`, {
           type: pendingUpdate.type,
           customization: pendingUpdate.customization,
         });

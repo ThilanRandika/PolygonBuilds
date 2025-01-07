@@ -148,7 +148,7 @@ const FileUpload = () => {
           console.log('Generated Image URL:', generatedImageUrl);
   
           // Save the file to MongoDB
-          const response = await axios.post('http://localhost:8070/api/file/saveFile', {
+          const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/file/saveFile`, {
             email,
             type: '3Dprinting',
             fileUrl: downloadURL,

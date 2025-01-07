@@ -15,7 +15,7 @@ function CustomizationsPreview({ selectedProcess, refreshPreview }) {
       setLoading(true); // Start overall loading
       try {
         const response = await axios.get(
-          `http://localhost:8070/api/customization/${selectedProcess.toLowerCase()}/all-customizations`
+          `${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/customization/${selectedProcess.toLowerCase()}/all-customizations`
         );
         setCustomizations(response.data);
 

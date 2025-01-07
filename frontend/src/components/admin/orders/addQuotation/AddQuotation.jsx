@@ -14,7 +14,7 @@ function AddQuotation() {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:8070/api/adminOrder/order/${id}`);
+        const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/adminOrder/order/${id}`);
         console.log('API Response:', response.data);
         setOrder(response.data);
       } catch (err) {

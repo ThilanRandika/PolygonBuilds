@@ -21,7 +21,7 @@ const Cart = () => {
 
   const fetchCartItems = async () => {
     try {
-      const response = await axios.get('http://localhost:8070/api/cart/all-cart');
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/cart/all-cart`);
       setCartItems(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching cart items:', error);
@@ -55,7 +55,7 @@ const Cart = () => {
 
   const removeItem = async (itemId) => {
     try {
-      await axios.delete(`http://localhost:8070/api/cart/delete/${itemId}`);
+      await axios.delete(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/cart/delete/${itemId}`);
       setCartItems(cartItems.filter((item) => item._id !== itemId));
     } catch (error) {
       console.error('Error removing item:', error);
@@ -104,7 +104,7 @@ const Cart = () => {
 
   
       // API call to create orders
-      const response = await axios.post('http://localhost:8070/api/order/create-multiple-orders', {
+      const response = await axios.post(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/order/create-multiple-orders`, {
         user_id: user._id,
         cartItems: orderPayload,
       });
